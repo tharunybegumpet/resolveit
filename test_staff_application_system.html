@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Application System Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .test-section h3 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+        .test-button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .response-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .step-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .step-list li {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .credentials {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .feature-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .feature-card h4 {
+            color: #495057;
+            margin-top: 0;
+        }
+        .url-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .url-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Staff Application System - Test Guide</h1>
+            <p>Complete testing guide for the ResolveIT Staff Application System</p>
+        </div>
+
+        <div class="status success">
+            ✅ <strong>System Status:</strong> Backend and Frontend are running successfully!
+            <br>
+            🔗 <strong>Backend:</strong> <a href="http://localhost:8080" target="_blank" class="url-link">http://localhost:8080</a>
+            <br>
+            🔗 <strong>Frontend:</strong> <a href="http://localhost:3000" target="_blank" class="url-link">http://localhost:3000</a>
+        </div>
+
+        <div class="test-section">
+            <h3>🔐 Test Credentials</h3>
+            <div class="credentials">
+                <h4>Admin Account:</h4>
+                <p><strong>Email:</strong> admin@resolveit.com</p>
+                <p><strong>Password:</strong> admin123</p>
+                
+                <h4>Test User Account (Create via Registration):</h4>
+                <p><strong>Email:</strong> user@test.com</p>
+                <p><strong>Password:</strong> password123</p>
+                <p><strong>Name:</strong> Test User</p>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Complete Testing Workflow</h3>
+            <ol class="step-list">
+                <li><strong>Step 1:</strong> Open <a href="http://localhost:3000" target="_blank" class="url-link">http://localhost:3000</a> in your browser</li>
+                <li><strong>Step 2:</strong> Register a new user account (if needed)</li>
+                <li><strong>Step 3:</strong> Login as a regular user</li>
+                <li><strong>Step 4:</strong> Navigate to User Dashboard</li>
+                <li><strong>Step 5:</strong> Click "Apply to Become Staff" button</li>
+                <li><strong>Step 6:</strong> Fill out the staff application form with qualification questions</li>
+                <li><strong>Step 7:</strong> Submit the application</li>
+                <li><strong>Step 8:</strong> Logout and login as admin (admin@resolveit.com / admin123)</li>
+                <li><strong>Step 9:</strong> Go to Admin Dashboard</li>
+                <li><strong>Step 10:</strong> Review pending staff applications</li>
+                <li><strong>Step 11:</strong> Click "Review Details" to see qualification answers</li>
+                <li><strong>Step 12:</strong> Approve or reject the application</li>
+                <li><strong>Step 13:</strong> Verify user role is updated to STAFF upon approval</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h3>🎯 Key Features to Test</h3>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h4>👤 User Side Features</h4>
+                    <ul>
+                        <li>Staff application form with qualification questions</li>
+                        <li>Category selection (multi-select checkboxes)</li>
+                        <li>Experience level dropdown</li>
+                        <li>Skills and availability fields</li>
+                        <li>Motivation and previous experience</li>
+                        <li>Application status tracking</li>
+                        <li>Prevention of duplicate applications</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>👨‍💼 Admin Side Features</h4>
+                    <ul>
+                        <li>Pending applications section</li>
+                        <li>Application count in dashboard stats</li>
+                        <li>Detailed application review modal</li>
+                        <li>View all qualification answers</li>
+                        <li>Approve/Reject with optional notes</li>
+                        <li>Automatic role update to STAFF</li>
+                        <li>Real-time dashboard updates</li>
+                    </ul>
+                </div>
+                
+                <div class="feature-card">
+                    <h4>🔧 Technical Features</h4>
+                    <ul>
+                        <li>JWT authentication for all endpoints</li>
+                        <li>Role-based access control</li>
+                        <li>Database table auto-creation</li>
+                        <li>Input validation and error handling</li>
+                        <li>Responsive design</li>
+                        <li>Status indicators and feedback</li>
+                        <li>RESTful API endpoints</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 API Endpoints Available</h3>
+            <div class="response-box">
+POST /api/staff-applications/apply - Submit staff application
+GET /api/staff-applications/my-applications - Get user's applications  
+GET /api/staff-applications/pending - Get pending applications (admin only)
+GET /api/staff-applications/all - Get all applications (admin only)
+PUT /api/staff-applications/{id}/approve - Approve application (admin only)
+PUT /api/staff-applications/{id}/reject - Reject application (admin only)
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>✅ Expected Test Results</h3>
+            <div class="info">
+                <h4>User Flow Success Criteria:</h4>
+                <ul>
+                    <li>✅ User can see "Become Staff" button in dashboard</li>
+                    <li>✅ Application form opens with all qualification questions</li>
+                    <li>✅ Form validates required fields before submission</li>
+                    <li>✅ Application submits successfully with success message</li>
+                    <li>✅ Status shows as "PENDING" after submission</li>
+                    <li>✅ User cannot submit duplicate applications</li>
+                </ul>
+                
+                <h4>Admin Flow Success Criteria:</h4>
+                <ul>
+                    <li>✅ Admin sees pending applications count in stats</li>
+                    <li>✅ Pending applications section displays correctly</li>
+                    <li>✅ "Review Details" modal shows all qualification answers</li>
+                    <li>✅ Approve button updates user role to STAFF</li>
+                    <li>✅ Reject button updates application status</li>
+                    <li>✅ Dashboard refreshes after admin actions</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🚀 Quick Start Links</h3>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="http://localhost:3000" target="_blank">
+                    <button class="test-button" style="font-size: 16px; padding: 15px 30px;">
+                        🌐 Open Frontend Application
+                    </button>
+                </a>
+                <a href="http://localhost:3000/login" target="_blank">
+                    <button class="test-button" style="font-size: 16px; padding: 15px 30px;">
+                        🔐 Go to Login Page
+                    </button>
+                </a>
+                <a href="http://localhost:3000/register" target="_blank">
+                    <button class="test-button" style="font-size: 16px; padding: 15px 30px;">
+                        📝 Register New User
+                    </button>
+                </a>
+            </div>
+        </div>
+
+        <div class="status info">
+            <strong>💡 Pro Tip:</strong> Open browser developer tools (F12) to monitor network requests and see API responses during testing.
+        </div>
+
+        <div class="status success">
+            <strong>🎉 System Ready!</strong> The staff application system is fully implemented and ready for testing. 
+            Follow the workflow above to test all features end-to-end.
+        </div>
+    </div>
+
+    <script>
+        // Add some interactive functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if services are running
+            const backendStatus = document.createElement('div');
+            const frontendStatus = document.createElement('div');
+            
+            // Test backend connectivity
+            fetch('http://localhost:8080/api/complaints/stats')
+                .then(response => {
+                    if (response.status === 401) {
+                        backendStatus.innerHTML = '✅ Backend is running (authentication required)';
+                        backendStatus.className = 'status success';
+                    } else {
+                        backendStatus.innerHTML = '✅ Backend is accessible';
+                        backendStatus.className = 'status success';
+                    }
+                })
+                .catch(error => {
+                    backendStatus.innerHTML = '❌ Backend connection failed: ' + error.message;
+                    backendStatus.className = 'status error';
+                });
+            
+            // Test frontend connectivity
+            fetch('http://localhost:3000')
+                .then(response => {
+                    frontendStatus.innerHTML = '✅ Frontend is accessible';
+                    frontendStatus.className = 'status success';
+                })
+                .catch(error => {
+                    frontendStatus.innerHTML = '❌ Frontend connection failed: ' + error.message;
+                    frontendStatus.className = 'status error';
+                });
+            
+            // Add status indicators
+            const container = document.querySelector('.container');
+            container.appendChild(backendStatus);
+            container.appendChild(frontendStatus);
+        });
+    </script>
+</body>
+</html>

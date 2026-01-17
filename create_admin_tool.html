@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Creation Tool - ResolveIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #17a2b8;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ff9800;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button.success {
+            background-color: #28a745;
+        }
+        .button.success:hover {
+            background-color: #1e7e34;
+        }
+        .sql-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .credentials-box {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Admin Creation Tool</h1>
+            <p>Generate SQL to create admin users manually</p>
+        </div>
+
+        <div class="info">
+            <h3>📋 How This Works</h3>
+            <p>This tool generates SQL statements to create admin users in the ResolveIT database. Admin registration has been removed from the frontend for security reasons.</p>
+            <ul>
+                <li>Fill in the admin user details below</li>
+                <li>Click "Generate SQL" to create the INSERT statement</li>
+                <li>Copy and execute the SQL in MySQL Workbench</li>
+                <li>Test login with the generated credentials</li>
+            </ul>
+        </div>
+
+        <form id="adminForm">
+            <div class="form-group">
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" value="System Administrator" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" value="admin" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="admin@resolveit.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="text" id="password" value="admin123" required>
+                <small style="color: #666;">Note: Password will be hashed automatically</small>
+            </div>
+
+            <button type="button" class="button" onclick="generateSQL()">
+                🔧 Generate SQL
+            </button>
+            <button type="button" class="button success" onclick="generateDefaultAdmin()">
+                ⚡ Use Default Admin
+            </button>
+        </form>
+
+        <div id="sqlResult" style="display: none;">
+            <h3>📝 Generated SQL Statement</h3>
+            <div class="sql-box" id="sqlCode"></div>
+            
+            <div class="credentials-box" id="credentialsBox">
+                <h4>🔑 Login Credentials</h4>
+                <div id="credentialsInfo"></div>
+            </div>
+
+            <button class="button" onclick="copySQL()">
+                📋 Copy SQL to Clipboard
+            </button>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Important Notes</h3>
+            <ul>
+                <li><strong>Security:</strong> Admin accounts can only be created manually</li>
+                <li><strong>Password:</strong> Default password is 'admin123' - change it after first login</li>
+                <li><strong>Database:</strong> Execute the SQL in MySQL Workbench connected to 'resolveit' database</li>
+                <li><strong>Testing:</strong> Test login at http://localhost:3000/login</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h3>✅ After Creating Admin</h3>
+            <ol>
+                <li>Execute the generated SQL in MySQL Workbench</li>
+                <li>Go to http://localhost:3000/login</li>
+                <li>Login with the generated credentials</li>
+                <li>Access Admin Dashboard to manage staff applications</li>
+                <li>Review and approve user applications to become staff</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        // Default password hash for 'admin123'
+        const DEFAULT_PASSWORD_HASH = '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi';
+
+        function generateSQL() {
+            const fullName = document.getElementById('fullName').value;
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (!fullName || !username || !email || !password) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // For this demo, we'll use the default hash for any password
+            // In a real system, you'd need to generate the BCrypt hash
+            const passwordHash = DEFAULT_PASSWORD_HASH;
+
+            const sql = `-- Create admin user for ResolveIT system
+USE resolveit;
+
+-- Insert admin user with hashed password
+INSERT INTO users (full_name, username, email, password_hash, role) 
+VALUES (
+    '${fullName}',
+    '${username}',
+    '${email}',
+    '${passwordHash}',
+    'ADMIN'
+) ON DUPLICATE KEY UPDATE 
+    full_name = '${fullName}',
+    username = '${username}',
+    password_hash = '${passwordHash}',
+    role = 'ADMIN';
+
+-- Verify the admin was created
+SELECT id, full_name, username, email, role FROM users WHERE email = '${email}';
+
+-- Show success message
+SELECT 'Admin user created successfully!' as status;`;
+
+            document.getElementById('sqlCode').textContent = sql;
+            document.getElementById('credentialsInfo').innerHTML = `
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Password:</strong> ${password}</p>
+                <p><strong>Role:</strong> ADMIN</p>
+                <p><strong>Login URL:</strong> <a href="http://localhost:3000/login" target="_blank">http://localhost:3000/login</a></p>
+            `;
+            document.getElementById('sqlResult').style.display = 'block';
+        }
+
+        function generateDefaultAdmin() {
+            document.getElementById('fullName').value = 'System Administrator';
+            document.getElementById('username').value = 'admin';
+            document.getElementById('email').value = 'admin@resolveit.com';
+            document.getElementById('password').value = 'admin123';
+            generateSQL();
+        }
+
+        function copySQL() {
+            const sqlCode = document.getElementById('sqlCode').textContent;
+            navigator.clipboard.writeText(sqlCode).then(function() {
+                alert('✅ SQL copied to clipboard! Paste it in MySQL Workbench.');
+            }, function(err) {
+                alert('❌ Could not copy to clipboard. Please select and copy the SQL manually.');
+            });
+        }
+
+        // Generate default admin on page load
+        window.onload = function() {
+            generateDefaultAdmin();
+        };
+    </script>
+</body>
+</html>

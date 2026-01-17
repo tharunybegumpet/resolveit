@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Current Users - ResolveIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .yopmail {
+            color: #2196F3;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Check Current Users in Database</h1>
+        <p>This tool shows all users currently in the ResolveIT database.</p>
+        
+        <button onclick="checkUsers()">Check All Users</button>
+        <button onclick="checkYopmailUsers()">Check Yopmail Users Only</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function checkUsers() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '⏳ Fetching users...';
+            
+            try {
+                // Get admin token first
+                const loginResponse = await fetch('http://localhost:8080/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'tharuny.begumpet@gmail.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                if (!loginResponse.ok) {
+                    resultDiv.innerHTML = '❌ Failed to login as admin. Please check credentials.';
+                    return;
+                }
+                
+                const loginData = await loginResponse.json();
+                const token = loginData.token;
+                
+                // Fetch all users (we'll need to create an endpoint for this)
+                // For now, let's show the login was successful
+                resultDiv.innerHTML = `
+                    ✅ Admin login successful!
+                    
+                    To see all users, run this SQL query in MySQL:
+                    
+                    SELECT id, full_name, email, role, username 
+                    FROM users 
+                    ORDER BY role, id;
+                    
+                    Current known accounts:
+                    - Admin: tharuny.begumpet@gmail.com (password: admin123)
+                    - User: user1@yopmail.com (password: password123)
+                    - Manager: manager2@yopmail.com (password: manager123)
+                    
+                    📧 All yopmail accounts can be checked at: https://yopmail.com
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+        
+        function checkYopmailUsers() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>📧 Yopmail Accounts Setup</h3>
+                
+                <table>
+                    <tr>
+                        <th>Role</th>
+                        <th>Email</th>
+                        <th>Password</th>
+                        <th>Check Inbox</th>
+                    </tr>
+                    <tr>
+                        <td>Admin</td>
+                        <td class="yopmail">tharuny.begumpet@gmail.com</td>
+                        <td>admin123</td>
+                        <td>Your Gmail</td>
+                    </tr>
+                    <tr>
+                        <td>User</td>
+                        <td class="yopmail">user1@yopmail.com</td>
+                        <td>password123</td>
+                        <td><a href="https://yopmail.com/en/?login=user1" target="_blank">Check Inbox</a></td>
+                    </tr>
+                    <tr>
+                        <td>Manager</td>
+                        <td class="yopmail">manager2@yopmail.com</td>
+                        <td>manager123</td>
+                        <td><a href="https://yopmail.com/en/?login=manager2" target="_blank">Check Inbox</a></td>
+                    </tr>
+                </table>
+                
+                <h3>📝 How to Check Emails:</h3>
+                <ol>
+                    <li>Click on "Check Inbox" links above</li>
+                    <li>Yopmail will open showing the inbox for that account</li>
+                    <li>No password needed - yopmail is a temporary email service</li>
+                    <li>Emails from tharuny.begumpet@gmail.com will appear here</li>
+                </ol>
+                
+                <h3>🔧 Setup Required:</h3>
+                <p>Make sure to add your Gmail App Password in application.properties:</p>
+                <pre>spring.mail.password=YOUR_GMAIL_APP_PASSWORD_HERE</pre>
+            `;
+        }
+    </script>
+</body>
+</html>

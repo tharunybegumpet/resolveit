@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Staff Members - ResolveIT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="bi bi-people-fill me-2"></i>Create Staff Members</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-info-circle me-2"></i>Staff Member Creation</h5>
+                            <p class="mb-0">This tool creates staff members that can be assigned to complaints. Staff members can view and manage assigned complaints.</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <h5>Quick Create - Default Staff Members</h5>
+                            <p class="text-muted">Create 3 default staff members for testing:</p>
+                            <button class="btn btn-primary" onclick="createDefaultStaff()">
+                                <i class="bi bi-plus-circle me-2"></i>Create Default Staff Members
+                            </button>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-4">
+                            <h5>Create Custom Staff Member</h5>
+                            <form id="staffForm">
+                                <div class="mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="fullName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" value="password123" required>
+                                    <div class="form-text">Default password: password123</div>
+                                </div>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="bi bi-person-plus me-2"></i>Create Staff Member
+                                </button>
+                            </form>
+                        </div>
+
+                        <hr>
+
+                        <div class="mb-4">
+                            <h5>Current Staff Members</h5>
+                            <button class="btn btn-outline-info" onclick="loadStaffMembers()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Refresh List
+                            </button>
+                            <div id="staffList" class="mt-3"></div>
+                        </div>
+
+                        <div id="result" class="mt-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api';
+
+        async function createDefaultStaff() {
+            const defaultStaff = [
+                { fullName: 'John Smith', email: 'john.staff@resolveit.com', password: 'password123' },
+                { fullName: 'Sarah Johnson', email: 'sarah.staff@resolveit.com', password: 'password123' },
+                { fullName: 'Mike Wilson', email: 'mike.staff@resolveit.com', password: 'password123' }
+            ];
+
+            let results = [];
+            for (const staff of defaultStaff) {
+                try {
+                    const result = await createStaffMember(staff);
+                    results.push(`✅ ${staff.fullName}: ${result.message}`);
+                } catch (error) {
+                    results.push(`❌ ${staff.fullName}: ${error.message}`);
+                }
+            }
+
+            document.getElementById('result').innerHTML = `
+                <div class="alert alert-info">
+                    <h5>Default Staff Creation Results:</h5>
+                    ${results.map(r => `<div>${r}</div>`).join('')}
+                </div>
+            `;
+
+            loadStaffMembers();
+        }
+
+        async function createStaffMember(staffData) {
+            const response = await fetch(`${API_BASE}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    fullName: staffData.fullName,
+                    email: staffData.email,
+                    password: staffData.password,
+                    role: 'STAFF'
+                })
+            });
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Registration failed');
+            }
+            return data;
+        }
+
+        async function loadStaffMembers() {
+            try {
+                const response = await fetch(`${API_BASE}/complaints/staff`);
+                const staffMembers = await response.json();
+
+                if (Array.isArray(staffMembers) && staffMembers.length > 0) {
+                    document.getElementById('staffList').innerHTML = `
+                        <div class="table-responsive">
+                            <table class="table table-dark table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${staffMembers.map(staff => `
+                                        <tr>
+                                            <td>${staff.id}</td>
+                                            <td>${staff.name}</td>
+                                            <td>${staff.email}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('staffList').innerHTML = `
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>No staff members found. Create some staff members first.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('staffList').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-x-circle me-2"></i>Error loading staff members: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        document.getElementById('staffForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const staffData = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            };
+
+            try {
+                const result = await createStaffMember(staffData);
+                document.getElementById('result').innerHTML = `
+                    <div class="alert alert-success">
+                        <h5><i class="bi bi-check-circle me-2"></i>Success!</h5>
+                        <p>Staff member "${staffData.fullName}" created successfully!</p>
+                    </div>
+                `;
+                document.getElementById('staffForm').reset();
+                document.getElementById('password').value = 'password123';
+                loadStaffMembers();
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5><i class="bi bi-x-circle me-2"></i>Error</h5>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        });
+
+        // Load staff members on page load
+        loadStaffMembers();
+    </script>
+</body>
+</html>

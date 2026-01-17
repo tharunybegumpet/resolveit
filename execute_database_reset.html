@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Reset - ResolveIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #dc3545;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #17a2b8;
+        }
+        .button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background-color: #c82333;
+        }
+        .sql-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗑️ Database Reset Instructions</h1>
+            <p>Clear all data from ResolveIT database</p>
+        </div>
+
+        <div class="danger">
+            <h3>⚠️ MANUAL DATABASE RESET REQUIRED</h3>
+            <p>Since we cannot directly access MySQL from the command line, please follow these steps to reset the database manually:</p>
+        </div>
+
+        <div class="info">
+            <h3>📋 Step-by-Step Instructions</h3>
+            <ol>
+                <li><strong>Open MySQL Workbench or Command Line</strong></li>
+                <li><strong>Connect to your MySQL database</strong> (localhost:3306, user: root)</li>
+                <li><strong>Select the 'resolveit' database</strong></li>
+                <li><strong>Execute the SQL script below</strong></li>
+            </ol>
+        </div>
+
+        <div class="sql-box">-- ResolveIT Database Reset Script
+-- Execute this in MySQL Workbench or MySQL Command Line
+
+USE resolveit;
+
+-- Disable foreign key checks temporarily
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Clear all data from tables
+DELETE FROM escalations;
+DELETE FROM complaint_status_history;
+DELETE FROM complaint_files;
+DELETE FROM staff_applications;
+DELETE FROM complaints;
+DELETE FROM users;
+DELETE FROM complaint_status;
+
+-- Reset auto-increment counters
+ALTER TABLE escalations AUTO_INCREMENT = 1;
+ALTER TABLE complaint_status_history AUTO_INCREMENT = 1;
+ALTER TABLE complaint_files AUTO_INCREMENT = 1;
+ALTER TABLE staff_applications AUTO_INCREMENT = 1;
+ALTER TABLE complaints AUTO_INCREMENT = 1;
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE complaint_status AUTO_INCREMENT = 1;
+
+-- Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Re-insert essential complaint status codes
+INSERT INTO complaint_status (code, display, description) VALUES
+('NEW', 'New', 'Newly submitted complaint'),
+('IN_PROGRESS', 'In Progress', 'Complaint is being worked on'),
+('RESOLVED', 'Resolved', 'Complaint has been resolved'),
+('CLOSED', 'Closed', 'Complaint is closed'),
+('ESCALATED', 'Escalated', 'Complaint has been escalated');
+
+-- Verify reset
+SELECT 'RESET COMPLETE' as status;
+SELECT 'Users:' as table_name, COUNT(*) as count FROM users
+UNION ALL
+SELECT 'Complaints:', COUNT(*) FROM complaints
+UNION ALL
+SELECT 'Staff Applications:', COUNT(*) FROM staff_applications
+UNION ALL
+SELECT 'Status Codes:', COUNT(*) FROM complaint_status;</div>
+
+        <div class="success">
+            <h3>✅ After Reset</h3>
+            <p>Once you've executed the SQL script:</p>
+            <ul>
+                <li>All users, complaints, and staff applications will be deleted</li>
+                <li>Only the 5 essential complaint status codes will remain</li>
+                <li>You can start fresh with the staff application system</li>
+                <li>Go to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a> to register new users</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h3>🎯 Quick Test After Reset</h3>
+            <ol>
+                <li>Open <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                <li>Register a new user account</li>
+                <li>Login and go to User Dashboard</li>
+                <li>Click "Apply to Become Staff"</li>
+                <li>Fill out the qualification form</li>
+                <li>Register an admin account</li>
+                <li>Login as admin and review the staff application</li>
+                <li>Approve or reject the application</li>
+            </ol>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="button" onclick="copySQL()">
+                📋 Copy SQL Script to Clipboard
+            </button>
+        </div>
+
+        <div id="copyResult"></div>
+    </div>
+
+    <script>
+        function copySQL() {
+            const sqlScript = `-- ResolveIT Database Reset Script
+-- Execute this in MySQL Workbench or MySQL Command Line
+
+USE resolveit;
+
+-- Disable foreign key checks temporarily
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Clear all data from tables
+DELETE FROM escalations;
+DELETE FROM complaint_status_history;
+DELETE FROM complaint_files;
+DELETE FROM staff_applications;
+DELETE FROM complaints;
+DELETE FROM users;
+DELETE FROM complaint_status;
+
+-- Reset auto-increment counters
+ALTER TABLE escalations AUTO_INCREMENT = 1;
+ALTER TABLE complaint_status_history AUTO_INCREMENT = 1;
+ALTER TABLE complaint_files AUTO_INCREMENT = 1;
+ALTER TABLE staff_applications AUTO_INCREMENT = 1;
+ALTER TABLE complaints AUTO_INCREMENT = 1;
+ALTER TABLE users AUTO_INCREMENT = 1;
+ALTER TABLE complaint_status AUTO_INCREMENT = 1;
+
+-- Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- Re-insert essential complaint status codes
+INSERT INTO complaint_status (code, display, description) VALUES
+('NEW', 'New', 'Newly submitted complaint'),
+('IN_PROGRESS', 'In Progress', 'Complaint is being worked on'),
+('RESOLVED', 'Resolved', 'Complaint has been resolved'),
+('CLOSED', 'Closed', 'Complaint is closed'),
+('ESCALATED', 'Escalated', 'Complaint has been escalated');
+
+-- Verify reset
+SELECT 'RESET COMPLETE' as status;
+SELECT 'Users:' as table_name, COUNT(*) as count FROM users
+UNION ALL
+SELECT 'Complaints:', COUNT(*) FROM complaints
+UNION ALL
+SELECT 'Staff Applications:', COUNT(*) FROM staff_applications
+UNION ALL
+SELECT 'Status Codes:', COUNT(*) FROM complaint_status;`;
+
+            navigator.clipboard.writeText(sqlScript).then(function() {
+                document.getElementById('copyResult').innerHTML = 
+                    '<div class="success">✅ SQL script copied to clipboard! Paste it in MySQL Workbench.</div>';
+            }, function(err) {
+                document.getElementById('copyResult').innerHTML = 
+                    '<div class="danger">❌ Could not copy to clipboard. Please select and copy the SQL script manually.</div>';
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Email System - ResolveIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button.secondary {
+            background: #2196F3;
+        }
+        button.secondary:hover {
+            background: #0b7dda;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .success {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+        .info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .yopmail-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .yopmail-links a {
+            flex: 1;
+            padding: 10px;
+            background: #FF9800;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .yopmail-links a:hover {
+            background: #F57C00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Email System Test Tool</h1>
+        <p class="subtitle">Test email notifications for ResolveIT complaint system</p>
+        
+        <div class="info">
+            <strong>📝 Setup Required:</strong><br>
+            1. Add your Gmail App Password to <code>application.properties</code><br>
+            2. Restart the backend server<br>
+            3. Make sure you have test accounts in database
+        </div>
+
+        <div class="section">
+            <h3>🎯 Test Scenarios</h3>
+            
+            <button onclick="testAssignmentEmail()">Test Assignment Email</button>
+            <button onclick="testStatusUpdateEmail()">Test Status Update Email</button>
+            <button onclick="testResolutionEmail()">Test Resolution Email</button>
+            
+            <div class="yopmail-links">
+                <a href="https://yopmail.com/en/?login=user1" target="_blank">📬 Check user1 Inbox</a>
+                <a href="https://yopmail.com/en/?login=manager2" target="_blank">📬 Check manager2 Inbox</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🔧 Quick Actions</h3>
+            <button class="secondary" onclick="checkBackendStatus()">Check Backend Status</button>
+            <button class="secondary" onclick="showEmailConfig()">Show Email Config</button>
+            <button class="secondary" onclick="showTestAccounts()">Show Test Accounts</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:8080';
+        const ADMIN_EMAIL = 'tharuny.begumpet@gmail.com';
+        const ADMIN_PASSWORD = 'admin123';
+
+        async function getAdminToken() {
+            const response = await fetch(`${BACKEND_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: ADMIN_EMAIL,
+                    password: ADMIN_PASSWORD
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to login as admin');
+            }
+            
+            const data = await response.json();
+            return data.token;
+        }
+
+        async function testAssignmentEmail() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '⏳ Testing assignment email...\n\n';
+            
+            try {
+                const token = await getAdminToken();
+                resultDiv.innerHTML += '✅ Admin login successful\n';
+                
+                // Get open complaints
+                const complaintsResponse = await fetch(`${BACKEND_URL}/api/complaints/open`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const complaints = await complaintsResponse.json();
+                
+                if (complaints.length === 0) {
+                    resultDiv.innerHTML += '\n❌ No open complaints found. Please create a complaint first.\n';
+                    return;
+                }
+                
+                const complaint = complaints[0];
+                resultDiv.innerHTML += `✅ Found complaint: ${complaint.title}\n`;
+                
+                // Get staff members
+                const staffResponse = await fetch(`${BACKEND_URL}/api/complaints/staff`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const staff = await staffResponse.json();
+                
+                if (staff.length === 0) {
+                    resultDiv.innerHTML += '\n❌ No staff members found. Please create a staff account first.\n';
+                    return;
+                }
+                
+                const staffMember = staff[0];
+                resultDiv.innerHTML += `✅ Found staff: ${staffMember.name}\n\n`;
+                
+                // Assign complaint
+                resultDiv.innerHTML += '📧 Assigning complaint and sending emails...\n';
+                
+                const assignResponse = await fetch(`${BACKEND_URL}/api/complaints/${complaint.id}/assign`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        staffId: staffMember.id,
+                        status: 'IN_PROGRESS'
+                    })
+                });
+                
+                const result = await assignResponse.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML += `\n<span class="success">✅ SUCCESS!</span>\n`;
+                    resultDiv.innerHTML += `Complaint assigned to ${staffMember.name}\n`;
+                    resultDiv.innerHTML += `Email sent: ${result.emailSent ? 'Yes' : 'No'}\n\n`;
+                    resultDiv.innerHTML += `📬 Check emails at:\n`;
+                    resultDiv.innerHTML += `- Staff: ${staffMember.email}\n`;
+                    resultDiv.innerHTML += `- User: ${complaint.raisedBy !== 'Anonymous' ? 'Check yopmail' : 'Anonymous (no email)'}\n\n`;
+                    resultDiv.innerHTML += `🔗 Open yopmail links above to see the emails!\n`;
+                } else {
+                    resultDiv.innerHTML += `\n<span class="error">❌ FAILED</span>\n${result.message}\n`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `\n<span class="error">❌ ERROR:</span> ${error.message}\n`;
+            }
+        }
+
+        async function testStatusUpdateEmail() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '⏳ Testing status update email...\n\n';
+            
+            try {
+                const token = await getAdminToken();
+                resultDiv.innerHTML += '✅ Admin login successful\n';
+                
+                // Get any complaint
+                const complaintsResponse = await fetch(`${BACKEND_URL}/api/complaints/recent`);
+                const complaints = await complaintsResponse.json();
+                
+                if (complaints.length === 0) {
+                    resultDiv.innerHTML += '\n❌ No complaints found.\n';
+                    return;
+                }
+                
+                const complaint = complaints[0];
+                resultDiv.innerHTML += `✅ Found complaint: ${complaint.title}\n\n`;
+                
+                // Update status
+                resultDiv.innerHTML += '📧 Updating status and sending email...\n';
+                
+                const updateResponse = await fetch(`${BACKEND_URL}/api/complaints/${complaint.id}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status: 'IN_PROGRESS'
+                    })
+                });
+                
+                const result = await updateResponse.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML += `\n<span class="success">✅ SUCCESS!</span>\n`;
+                    resultDiv.innerHTML += `Status updated to IN_PROGRESS\n`;
+                    resultDiv.innerHTML += `Email sent: ${result.emailSent ? 'Yes' : 'No'}\n\n`;
+                    resultDiv.innerHTML += `📬 Check yopmail for the user's email!\n`;
+                } else {
+                    resultDiv.innerHTML += `\n<span class="error">❌ FAILED</span>\n${result.message}\n`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `\n<span class="error">❌ ERROR:</span> ${error.message}\n`;
+            }
+        }
+
+        async function testResolutionEmail() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '⏳ Testing resolution email...\n\n';
+            
+            try {
+                const token = await getAdminToken();
+                resultDiv.innerHTML += '✅ Admin login successful\n';
+                
+                // Get any complaint
+                const complaintsResponse = await fetch(`${BACKEND_URL}/api/complaints/recent`);
+                const complaints = await complaintsResponse.json();
+                
+                if (complaints.length === 0) {
+                    resultDiv.innerHTML += '\n❌ No complaints found.\n';
+                    return;
+                }
+                
+                const complaint = complaints[0];
+                resultDiv.innerHTML += `✅ Found complaint: ${complaint.title}\n\n`;
+                
+                // Resolve complaint
+                resultDiv.innerHTML += '📧 Resolving complaint and sending email...\n';
+                
+                const resolveResponse = await fetch(`${BACKEND_URL}/api/complaints/${complaint.id}/resolve`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await resolveResponse.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML += `\n<span class="success">✅ SUCCESS!</span>\n`;
+                    resultDiv.innerHTML += `Complaint resolved!\n`;
+                    resultDiv.innerHTML += `Notification sent: ${result.notificationSent ? 'Yes' : 'No'}\n\n`;
+                    resultDiv.innerHTML += `📬 Check yopmail for the resolution email!\n`;
+                } else {
+                    resultDiv.innerHTML += `\n<span class="error">❌ FAILED</span>\n${result.message}\n`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML += `\n<span class="error">❌ ERROR:</span> ${error.message}\n`;
+            }
+        }
+
+        async function checkBackendStatus() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '⏳ Checking backend status...\n\n';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/complaints/recent`);
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = '<span class="success">✅ Backend is running!</span>\n\n';
+                    resultDiv.innerHTML += `URL: ${BACKEND_URL}\n`;
+                    resultDiv.innerHTML += `Status: Online\n`;
+                } else {
+                    resultDiv.innerHTML = '<span class="error">❌ Backend returned error</span>\n';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<span class="error">❌ Backend is not running!</span>\n\n';
+                resultDiv.innerHTML += `Please start the backend server:\n`;
+                resultDiv.innerHTML += `cd resolveit-backend\n`;
+                resultDiv.innerHTML += `mvn spring-boot:run\n`;
+            }
+        }
+
+        function showEmailConfig() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+📧 Email Configuration
+
+File: resolveit-backend/src/main/resources/application.properties
+
+Required settings:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=tharuny.begumpet@gmail.com
+spring.mail.password=YOUR_GMAIL_APP_PASSWORD_HERE
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ IMPORTANT:
+1. Generate Gmail App Password at: https://myaccount.google.com/apppasswords
+2. Replace YOUR_GMAIL_APP_PASSWORD_HERE with actual password
+3. Restart backend after updating
+
+Emails will be sent FROM: tharuny.begumpet@gmail.com
+Emails will be sent TO: user1@yopmail.com, manager2@yopmail.com, etc.
+            `;
+        }
+
+        function showTestAccounts() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+📋 Test Accounts
+
+Admin Account:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Email: tharuny.begumpet@gmail.com
+Password: admin123
+Role: ADMIN
+Check emails: Your Gmail inbox
+
+User Account:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Email: user1@yopmail.com
+Password: password123
+Role: USER
+Check emails: https://yopmail.com/en/?login=user1
+
+Manager Account:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Email: manager2@yopmail.com
+Password: manager123
+Role: MANAGER
+Check emails: https://yopmail.com/en/?login=manager2
+
+📝 Note: Yopmail accounts don't need passwords to check emails!
+Just go to yopmail.com and enter the username (user1, manager2, etc.)
+            `;
+        }
+    </script>
+</body>
+</html>

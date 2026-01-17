@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Reset Tool - ResolveIT</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #ff9800;
+        }
+        .danger {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #dc3545;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #28a745;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #dc3545;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .button.danger {
+            background-color: #dc3545;
+        }
+        .button.danger:hover {
+            background-color: #c82333;
+        }
+        .button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .stats-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗑️ Database Reset Tool</h1>
+            <p>Clear all data from ResolveIT database</p>
+        </div>
+
+        <div class="danger">
+            <h3>⚠️ DANGER ZONE</h3>
+            <p><strong>This tool will permanently delete ALL data from the database including:</strong></p>
+            <ul>
+                <li>All user accounts (admin, staff, users)</li>
+                <li>All complaints and their history</li>
+                <li>All staff applications</li>
+                <li>All escalations</li>
+                <li>All file uploads</li>
+            </ul>
+            <p><strong>This action cannot be undone!</strong></p>
+        </div>
+
+        <div class="stats-box">
+            <h3>📊 Current Database Statistics</h3>
+            <div id="statsContainer">
+                <div class="loading">Loading database statistics...</div>
+            </div>
+            <button class="button" onclick="loadStats()">🔄 Refresh Stats</button>
+        </div>
+
+        <div class="warning">
+            <h3>🔧 When to Use This Tool</h3>
+            <ul>
+                <li>Starting fresh testing of the staff application system</li>
+                <li>Clearing test data before demonstration</li>
+                <li>Resetting the system to initial state</li>
+                <li>Development and testing purposes only</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <button class="button danger" onclick="confirmReset()" id="resetButton">
+                🗑️ RESET DATABASE (DELETE ALL DATA)
+            </button>
+        </div>
+
+        <div id="resultContainer"></div>
+
+        <div class="warning">
+            <h3>📝 After Reset</h3>
+            <p>After resetting the database:</p>
+            <ol>
+                <li>All tables will be empty except complaint status codes</li>
+                <li>You can register new users through the frontend</li>
+                <li>Create admin accounts using the registration system</li>
+                <li>Test the staff application system with fresh data</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080/api/database';
+
+        async function loadStats() {
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = '<div class="loading">Loading database statistics...</div>';
+
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    statsContainer.innerHTML = `
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-number">${stats.users}</div>
+                                <div class="stat-label">Users</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">${stats.complaints}</div>
+                                <div class="stat-label">Complaints</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">${stats.staffApplications}</div>
+                                <div class="stat-label">Staff Applications</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">${stats.escalations}</div>
+                                <div class="stat-label">Escalations</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">${stats.statusCodes}</div>
+                                <div class="stat-label">Status Codes</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    statsContainer.innerHTML = `<div class="error">Error loading stats: ${data.message}</div>`;
+                }
+            } catch (error) {
+                statsContainer.innerHTML = `<div class="error">Error connecting to backend: ${error.message}</div>`;
+            }
+        }
+
+        function confirmReset() {
+            const confirmed = confirm(
+                "⚠️ FINAL WARNING ⚠️\n\n" +
+                "This will permanently delete ALL data from the database:\n" +
+                "• All users (admin, staff, regular users)\n" +
+                "• All complaints and their history\n" +
+                "• All staff applications\n" +
+                "• All escalations\n" +
+                "• All uploaded files\n\n" +
+                "This action CANNOT be undone!\n\n" +
+                "Are you absolutely sure you want to proceed?"
+            );
+
+            if (confirmed) {
+                const doubleConfirm = confirm(
+                    "🚨 LAST CHANCE 🚨\n\n" +
+                    "You are about to delete ALL data from the ResolveIT database.\n\n" +
+                    "Type 'DELETE' in the next prompt to confirm."
+                );
+
+                if (doubleConfirm) {
+                    const typeConfirm = prompt("Type 'DELETE' to confirm database reset:");
+                    if (typeConfirm === 'DELETE') {
+                        resetDatabase();
+                    } else {
+                        alert("Reset cancelled - incorrect confirmation text.");
+                    }
+                } else {
+                    alert("Reset cancelled.");
+                }
+            }
+        }
+
+        async function resetDatabase() {
+            const resetButton = document.getElementById('resetButton');
+            const resultContainer = document.getElementById('resultContainer');
+
+            resetButton.disabled = true;
+            resetButton.textContent = '🔄 Resetting Database...';
+
+            try {
+                const response = await fetch(`${API_BASE}/reset`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    resultContainer.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Database Reset Successful!</h3>
+                            <p>${data.message}</p>
+                            <p><strong>Status codes reinserted:</strong> ${data.statusCodesReinserted}</p>
+                            <p><strong>Next steps:</strong></p>
+                            <ul>
+                                <li>Go to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                                <li>Register new user accounts</li>
+                                <li>Test the staff application system</li>
+                            </ul>
+                        </div>
+                    `;
+                    // Refresh stats after successful reset
+                    loadStats();
+                } else {
+                    resultContainer.innerHTML = `
+                        <div class="error">
+                            <h3>❌ Reset Failed</h3>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultContainer.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Connection Error</h3>
+                        <p>Could not connect to backend: ${error.message}</p>
+                        <p>Make sure the backend is running on http://localhost:8080</p>
+                    </div>
+                `;
+            } finally {
+                resetButton.disabled = false;
+                resetButton.textContent = '🗑️ RESET DATABASE (DELETE ALL DATA)';
+            }
+        }
+
+        // Load stats when page loads
+        document.addEventListener('DOMContentLoaded', loadStats);
+    </script>
+</body>
+</html>

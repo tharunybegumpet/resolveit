@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Upload System Test - ResolveIT</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-white">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card bg-secondary">
+                    <div class="card-header">
+                        <h3 class="mb-0"><i class="bi bi-cloud-upload me-2"></i>File Upload System Test</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h5><i class="bi bi-info-circle me-2"></i>Test Instructions</h5>
+                            <p class="mb-2">This tool tests the enhanced file upload system with the following features:</p>
+                            <ul class="mb-0">
+                                <li><strong>File Type Support:</strong> Images, PDFs, Videos, Documents</li>
+                                <li><strong>Size Limits:</strong> Images (5MB), Documents (10MB), Videos (50MB)</li>
+                                <li><strong>Admin-Only Files:</strong> PDFs and Videos are restricted to admin viewing</li>
+                                <li><strong>Security:</strong> File type validation and size restrictions</li>
+                            </ul>
+                        </div>
+
+                        <form id="testForm">
+                            <div class="mb-3">
+                                <label class="form-label">Test Complaint Title</label>
+                                <input type="text" class="form-control" id="title" value="File Upload Test Complaint" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" id="category" required>
+                                    <option value="Technical Issues">Technical Issues</option>
+                                    <option value="Maintenance">Maintenance</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Description</label>
+                                <textarea class="form-control" id="description" rows="3" required>Testing the file upload system with various file types including admin-only files.</textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Test Files</label>
+                                <input type="file" class="form-control" id="files" multiple 
+                                       accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.txt,.mp4,.avi,.mov,.wmv,.webm">
+                                <div class="form-text">
+                                    <strong>Supported:</strong> Images (jpg, png, gif), PDFs, Documents (doc, docx, txt), Videos (mp4, avi, mov)
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="anonymous">
+                                    <label class="form-check-label" for="anonymous">Submit as Anonymous</label>
+                                </div>
+                            </div>
+
+                            <div id="filePreview" class="mb-3"></div>
+
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="bi bi-upload me-2"></i>Test File Upload
+                            </button>
+                        </form>
+
+                        <div id="result" class="mt-4"></div>
+                    </div>
+                </div>
+
+                <div class="card bg-secondary mt-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-list-check me-2"></i>Test Checklist</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>File Type Tests:</h6>
+                                <ul class="list-unstyled">
+                                    <li><input type="checkbox" class="me-2">📷 Upload image file (should work)</li>
+                                    <li><input type="checkbox" class="me-2">📄 Upload PDF file (admin-only)</li>
+                                    <li><input type="checkbox" class="me-2">🎥 Upload video file (admin-only)</li>
+                                    <li><input type="checkbox" class="me-2">📝 Upload document file (should work)</li>
+                                    <li><input type="checkbox" class="me-2">❌ Try unsupported file type (should fail)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Size Limit Tests:</h6>
+                                <ul class="list-unstyled">
+                                    <li><input type="checkbox" class="me-2">📷 Large image >5MB (should fail)</li>
+                                    <li><input type="checkbox" class="me-2">📄 Large PDF >10MB (should fail)</li>
+                                    <li><input type="checkbox" class="me-2">🎥 Large video >50MB (should fail)</li>
+                                </ul>
+                                <h6>Access Tests:</h6>
+                                <ul class="list-unstyled">
+                                    <li><input type="checkbox" class="me-2">👤 View as regular user</li>
+                                    <li><input type="checkbox" class="me-2">👑 View as admin</li>
+                                    <li><input type="checkbox" class="me-2">🔒 Try accessing admin-only files</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('testForm');
+        const filesInput = document.getElementById('files');
+        const filePreview = document.getElementById('filePreview');
+        const result = document.getElementById('result');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // File type validation
+        const allowedTypes = {
+            images: ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+            documents: ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'],
+            videos: ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/webm']
+        };
+
+        const maxSizes = {
+            image: 5 * 1024 * 1024, // 5MB
+            document: 10 * 1024 * 1024, // 10MB
+            video: 50 * 1024 * 1024 // 50MB
+        };
+
+        function getFileIcon(type) {
+            if (allowedTypes.images.includes(type)) return '🖼️';
+            if (type === 'application/pdf') return '📄';
+            if (allowedTypes.documents.includes(type)) return '📝';
+            if (allowedTypes.videos.includes(type)) return '🎥';
+            return '📎';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function validateFile(file) {
+            const isImage = allowedTypes.images.includes(file.type);
+            const isDocument = allowedTypes.documents.includes(file.type);
+            const isVideo = allowedTypes.videos.includes(file.type);
+
+            if (!isImage && !isDocument && !isVideo) {
+                return { valid: false, error: 'File type not allowed' };
+            }
+
+            let maxSize;
+            if (isImage) maxSize = maxSizes.image;
+            else if (isDocument) maxSize = maxSizes.document;
+            else if (isVideo) maxSize = maxSizes.video;
+
+            if (file.size > maxSize) {
+                const maxSizeMB = Math.round(maxSize / (1024 * 1024));
+                return { valid: false, error: `File too large. Maximum: ${maxSizeMB}MB` };
+            }
+
+            return { valid: true };
+        }
+
+        filesInput.addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            let previewHTML = '';
+
+            if (files.length > 0) {
+                previewHTML = '<h6>Selected Files:</h6>';
+                files.forEach((file, index) => {
+                    const validation = validateFile(file);
+                    const isAdminOnly = file.type === 'application/pdf' || file.type.startsWith('video/');
+                    
+                    previewHTML += `
+                        <div class="d-flex align-items-center justify-content-between p-2 mb-2 rounded ${validation.valid ? 'bg-success bg-opacity-25' : 'bg-danger bg-opacity-25'}">
+                            <div class="d-flex align-items-center">
+                                <span class="me-2">${getFileIcon(file.type)}</span>
+                                <div>
+                                    <div class="fw-semibold">${file.name}</div>
+                                    <div class="small text-muted">
+                                        ${formatFileSize(file.size)}
+                                        ${isAdminOnly ? '<span class="badge bg-warning text-dark ms-2">Admin Only</span>' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                ${validation.valid ? 
+                                    '<i class="bi bi-check-circle text-success"></i>' : 
+                                    `<i class="bi bi-x-circle text-danger" title="${validation.error}"></i>`
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            filePreview.innerHTML = previewHTML;
+        });
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('category', document.getElementById('category').value);
+            formData.append('description', document.getElementById('description').value);
+            formData.append('anonymous', document.getElementById('anonymous').checked);
+
+            const files = filesInput.files;
+            for (let file of files) {
+                formData.append('files', file);
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Uploading...';
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:8080/api/complaints/with-files', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    result.innerHTML = `
+                        <div class="alert alert-success">
+                            <h5><i class="bi bi-check-circle me-2"></i>Success!</h5>
+                            <p><strong>Complaint ID:</strong> ${data.complaintId}</p>
+                            <p><strong>Files Uploaded:</strong> ${data.uploadedFiles ? data.uploadedFiles.length : 0}</p>
+                            ${data.uploadedFiles && data.uploadedFiles.length > 0 ? `
+                                <div class="mt-3">
+                                    <h6>Uploaded Files:</h6>
+                                    ${data.uploadedFiles.map(file => `
+                                        <div class="small">
+                                            ${getFileIcon(file.fileType)} ${file.fileName} 
+                                            (${file.fileCategory})
+                                            ${file.adminOnly ? '<span class="badge bg-warning text-dark ms-1">Admin Only</span>' : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            ` : ''}
+                            <div class="mt-3">
+                                <a href="http://localhost:3000/complaint/${data.complaintId}" class="btn btn-sm btn-outline-success" target="_blank">
+                                    <i class="bi bi-eye me-1"></i>View Complaint
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    result.innerHTML = `
+                        <div class="alert alert-danger">
+                            <h5><i class="bi bi-x-circle me-2"></i>Error</h5>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                result.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h5><i class="bi bi-x-circle me-2"></i>Network Error</h5>
+                        <p>Failed to connect to server. Make sure the backend is running on port 8080.</p>
+                        <p class="small text-muted">${error.message}</p>
+                    </div>
+                `;
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="bi bi-upload me-2"></i>Test File Upload';
+            }
+        });
+
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            result.innerHTML = `
+                <div class="alert alert-warning">
+                    <h5><i class="bi bi-exclamation-triangle me-2"></i>Authentication Required</h5>
+                    <p>You need to be logged in to test file uploads.</p>
+                    <a href="http://localhost:3000/login" class="btn btn-sm btn-outline-warning" target="_blank">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                    </a>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
