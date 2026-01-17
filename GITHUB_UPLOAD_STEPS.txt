@@ -1,0 +1,32 @@
+SIMPLE STEPS TO UPLOAD YOUR PROJECT TO GITHUB:
+
+1. GO TO GITHUB.COM
+   - Login to your account
+   - Click "New" button (green button)
+
+2. CREATE REPOSITORY
+   - Name: resolveit-complaint-management
+   - Description: My complaint management system project
+   - Make it PUBLIC
+   - DON'T add README (we have one)
+   - Click "Create repository"
+
+3. COPY YOUR REPOSITORY URL
+   - It will look like: https://github.com/YOUR_USERNAME/resolveit-complaint-management.git
+   - Replace YOUR_USERNAME with your actual GitHub username
+
+4. RUN THESE COMMANDS IN COMMAND PROMPT:
+   
+   cd "C:\Users\tharuny\Downloads\projects resolve (1)\projects resolve\projects\resolveit_option_c_full"
+   
+   git remote add origin https://github.com/YOUR_USERNAME/resolveit-complaint-management.git
+   
+   git push -u origin main
+
+5. SHARE WITH MENTOR:
+   - Send this URL to your mentor: https://github.com/YOUR_USERNAME/resolveit-complaint-management
+   - They can see all your code and documentation
+
+THAT'S IT! Your project will be online and your mentor can see everything.
+
+If you get any errors, just tell me what the error message says and I'll help you fix it.

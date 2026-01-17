@@ -1,0 +1,34 @@
+UPDATE YOUR EXISTING GITHUB REPOSITORY:
+
+STEP 1: GET YOUR REPOSITORY URL
+- Go to your existing GitHub repository (where you have Module 2)
+- Click the green "Code" button
+- Copy the HTTPS URL (looks like: https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git)
+
+STEP 2: CONNECT AND PUSH
+Run these commands in Command Prompt:
+
+cd "C:\Users\tharuny\Downloads\projects resolve (1)\projects resolve\projects\resolveit_option_c_full"
+
+git remote add origin [PASTE YOUR REPOSITORY URL HERE]
+
+git push -u origin main
+
+STEP 3: WHAT WILL HAPPEN
+- Your existing Module 2 code will stay
+- All new features will be added:
+  ✅ File upload system (PDFs/videos admin-only)
+  ✅ Email notifications 
+  ✅ Enhanced admin dashboard
+  ✅ Staff assignment system
+  ✅ Escalation system
+  ✅ Reports module
+  ✅ All documentation and guides
+
+STEP 4: SHARE WITH MENTOR
+- Your mentor will see the complete project
+- They can see the progression from Module 2 to complete system
+- All commit history is preserved
+
+NEED HELP?
+Just tell me your GitHub repository URL and I'll give you the exact commands to run!
