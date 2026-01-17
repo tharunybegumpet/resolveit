@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Presentation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .test-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .test-btn:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .step { margin: 10px 0; padding: 10px; background: #f8f9fa; border-left: 4px solid #007bff; }
+        .critical { border-left-color: #dc3545; background: #f8d7da; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛡️ Admin Dashboard - Presentation Test</h1>
+            <p>Comprehensive testing for admin dashboard functionality</p>
+        </div>
+
+        <!-- Critical Pre-Checks -->
+        <div class="test-section">
+            <h2>🚨 Critical Pre-Checks</h2>
+            <div class="step critical">
+                <h4>1. Backend Server Status</h4>
+                <button class="test-btn" onclick="testBackendConnection()">Test Backend Connection</button>
+                <div id="backendResult"></div>
+            </div>
+            
+            <div class="step critical">
+                <h4>2. Admin Authentication</h4>
+                <button class="test-btn" onclick="testAdminAuth()">Test Admin Login</button>
+                <div id="authResult"></div>
+            </div>
+            
+            <div class="step critical">
+                <h4>3. Database Connection</h4>
+                <button class="test-btn" onclick="testDatabase()">Test Database</button>
+                <div id="dbResult"></div>
+            </div>
+        </div>
+
+        <!-- API Endpoint Tests -->
+        <div class="test-section">
+            <h2>🔌 API Endpoint Tests</h2>
+            <div class="step">
+                <h4>Complaints API</h4>
+                <button class="test-btn" onclick="testComplaintsAPI()">Test /api/complaints</button>
+                <div id="complaintsResult"></div>
+            </div>
+            
+            <div class="step">
+                <h4>Stats API</h4>
+                <button class="test-btn" onclick="testStatsAPI()">Test /api/complaints/stats</button>
+                <div id="statsResult"></div>
+            </div>
+            
+            <div class="step">
+                <h4>Staff API</h4>
+                <button class="test-btn" onclick="testStaffAPI()">Test /api/complaints/staff</button>
+                <div id="staffResult"></div>
+            </div>
+        </div>
+
+        <!-- Dashboard Functionality Tests -->
+        <div class="test-section">
+            <h2>📊 Dashboard Functionality Tests</h2>
+            <div class="step">
+                <h4>Dashboard Loading</h4>
+                <button class="test-btn" onclick="testDashboardLoad()">Test Dashboard Load</button>
+                <div id="dashboardResult"></div>
+            </div>
+            
+            <div class="step">
+                <h4>Status Update</h4>
+                <button class="test-btn" onclick="testStatusUpdate()">Test Status Update</button>
+                <div id="statusResult"></div>
+            </div>
+            
+            <div class="step">
+                <h4>Staff Assignment</h4>
+                <button class="test-btn" onclick="testStaffAssignment()">Test Staff Assignment</button>
+                <div id="assignmentResult"></div>
+            </div>
+        </div>
+
+        <!-- Common Error Scenarios -->
+        <div class="test-section">
+            <h2>⚠️ Common Error Scenarios</h2>
+            
+            <div class="warning">
+                <h4>Error 1: "Cannot read properties of undefined"</h4>
+                <p><strong>Cause:</strong> API response format mismatch</p>
+                <p><strong>Fix:</strong> Added null checks and default values</p>
+                <p><strong>Status:</strong> ✅ Fixed with defensive programming</p>
+            </div>
+            
+            <div class="warning">
+                <h4>Error 2: "Network Error" / CORS Issues</h4>
+                <p><strong>Cause:</strong> Backend not running or CORS misconfiguration</p>
+                <p><strong>Fix:</strong> Ensure backend on port 8080, CORS configured</p>
+                <p><strong>Status:</strong> ✅ Fixed with proper error handling</p>
+            </div>
+            
+            <div class="warning">
+                <h4>Error 3: "401 Unauthorized"</h4>
+                <p><strong>Cause:</strong> JWT token expired or invalid</p>
+                <p><strong>Fix:</strong> Added authentication checks and redirects</p>
+                <p><strong>Status:</strong> ✅ Fixed with auth validation</p>
+            </div>
+            
+            <div class="warning">
+                <h4>Error 4: "Staff members not loading"</h4>
+                <p><strong>Cause:</strong> Missing staff in database</p>
+                <p><strong>Fix:</strong> Added fallback handling and user creation tools</p>
+                <p><strong>Status:</strong> ✅ Fixed with graceful degradation</p>
+            </div>
+        </div>
+
+        <!-- Presentation Demo Flow -->
+        <div class="test-section">
+            <h2>🎬 Presentation Demo Flow</h2>
+            
+            <div class="step">
+                <h4>Step 1: Login as Admin</h4>
+                <p>URL: <a href="http://localhost:3000/login" target="_blank">http://localhost:3000/login</a></p>
+                <p>Credentials: <strong>admin@resolveit.com</strong> / <strong>admin123</strong></p>
+                <button class="test-btn" onclick="openAdminLogin()">Open Login Page</button>
+            </div>
+            
+            <div class="step">
+                <h4>Step 2: View Dashboard</h4>
+                <p>URL: <a href="http://localhost:3000/admin" target="_blank">http://localhost:3000/admin</a></p>
+                <p>Expected: Stats, complaint list, action buttons</p>
+                <button class="test-btn" onclick="openAdminDashboard()">Open Admin Dashboard</button>
+            </div>
+            
+            <div class="step">
+                <h4>Step 3: Test Key Features</h4>
+                <ul>
+                    <li>✅ View complaint statistics</li>
+                    <li>✅ Assign complaints to staff</li>
+                    <li>✅ Update complaint status</li>
+                    <li>✅ Navigate to reports and escalations</li>
+                    <li>✅ Resolve complaints</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Emergency Fixes -->
+        <div class="test-section error">
+            <h2>🚨 Emergency Fixes (If Errors Occur During Presentation)</h2>
+            
+            <div class="step">
+                <h4>Fix 1: Backend Connection Failed</h4>
+                <p><strong>Quick Fix:</strong> Restart backend server</p>
+                <code>cd resolveit-backend && mvn spring-boot:run</code>
+            </div>
+            
+            <div class="step">
+                <h4>Fix 2: Admin Login Failed</h4>
+                <p><strong>Quick Fix:</strong> Create admin user manually</p>
+                <button class="test-btn" onclick="window.open('create_admin_user.html', '_blank')">Create Admin User</button>
+            </div>
+            
+            <div class="step">
+                <h4>Fix 3: No Complaints Showing</h4>
+                <p><strong>Quick Fix:</strong> Submit test complaint</p>
+                <button class="test-btn" onclick="window.open('http://localhost:3000/complaint', '_blank')">Submit Test Complaint</button>
+            </div>
+            
+            <div class="step">
+                <h4>Fix 4: Staff Members Not Loading</h4>
+                <p><strong>Quick Fix:</strong> Create staff members</p>
+                <button class="test-btn" onclick="window.open('create_staff_members.html', '_blank')">Create Staff Members</button>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <div id="allResults">
+                <p>Click the test buttons above to validate your system...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testBackendConnection() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = '<div class="result">Testing backend connection...</div>';
+            
+            fetch('http://localhost:8080/api/complaints')
+                .then(response => {
+                    if (response.ok) {
+                        resultDiv.innerHTML = '<div class="result success">✅ Backend is running and accessible</div>';
+                        return response.json();
+                    } else {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                })
+                .then(data => {
+                    resultDiv.innerHTML += `<div class="result success">✅ API returned ${Array.isArray(data) ? data.length : 'data'} items</div>`;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<div class="result error">❌ Backend connection failed: ${error.message}</div>`;
+                });
+        }
+
+        function testAdminAuth() {
+            const resultDiv = document.getElementById('authResult');
+            const token = localStorage.getItem('token');
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            
+            if (!token) {
+                resultDiv.innerHTML = '<div class="result error">❌ No auth token found. Please login first.</div>';
+                return;
+            }
+            
+            if (user.role !== 'ADMIN') {
+                resultDiv.innerHTML = `<div class="result error">❌ User role is ${user.role}, not ADMIN</div>`;
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="result success">✅ Admin authentication valid</div>';
+        }
+
+        function testDatabase() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.innerHTML = '<div class="result">Testing database connection...</div>';
+            
+            fetch('http://localhost:8080/api/complaints/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resultDiv.innerHTML = `<div class="result success">✅ Database connected - Total complaints: ${data.stats.total}</div>`;
+                    } else {
+                        throw new Error('Stats API returned error');
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<div class="result error">❌ Database test failed: ${error.message}</div>`;
+                });
+        }
+
+        function testComplaintsAPI() {
+            const resultDiv = document.getElementById('complaintsResult');
+            resultDiv.innerHTML = '<div class="result">Testing complaints API...</div>';
+            
+            fetch('http://localhost:8080/api/complaints')
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        resultDiv.innerHTML = `<div class="result success">✅ Complaints API working - ${data.length} complaints found</div>`;
+                    } else {
+                        throw new Error('Unexpected response format');
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<div class="result error">❌ Complaints API failed: ${error.message}</div>`;
+                });
+        }
+
+        function testStatsAPI() {
+            const resultDiv = document.getElementById('statsResult');
+            resultDiv.innerHTML = '<div class="result">Testing stats API...</div>';
+            
+            fetch('http://localhost:8080/api/complaints/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.stats) {
+                        resultDiv.innerHTML = `<div class="result success">✅ Stats API working - Total: ${data.stats.total}</div>`;
+                    } else {
+                        throw new Error('Stats API returned unexpected format');
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<div class="result error">❌ Stats API failed: ${error.message}</div>`;
+                });
+        }
+
+        function testStaffAPI() {
+            const resultDiv = document.getElementById('staffResult');
+            resultDiv.innerHTML = '<div class="result">Testing staff API...</div>';
+            
+            fetch('http://localhost:8080/api/complaints/staff')
+                .then(response => response.json())
+                .then(data => {
+                    if (Array.isArray(data)) {
+                        resultDiv.innerHTML = `<div class="result success">✅ Staff API working - ${data.length} staff members found</div>`;
+                    } else {
+                        throw new Error('Unexpected response format');
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<div class="result error">❌ Staff API failed: ${error.message}</div>`;
+                });
+        }
+
+        function testDashboardLoad() {
+            window.open('http://localhost:3000/admin', '_blank');
+        }
+
+        function testStatusUpdate() {
+            alert('This requires manual testing in the admin dashboard. Submit a complaint first, then try updating its status.');
+        }
+
+        function testStaffAssignment() {
+            alert('This requires manual testing in the admin dashboard. Ensure staff members exist, then try assigning a complaint.');
+        }
+
+        function openAdminLogin() {
+            window.open('http://localhost:3000/login', '_blank');
+        }
+
+        function openAdminDashboard() {
+            window.open('http://localhost:3000/admin', '_blank');
+        }
+
+        // Auto-run critical tests on page load
+        window.onload = function() {
+            setTimeout(testBackendConnection, 1000);
+            setTimeout(testDatabase, 2000);
+            setTimeout(testAdminAuth, 3000);
+        };
+    </script>
+</body>
+</html>

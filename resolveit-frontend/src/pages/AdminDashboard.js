@@ -1,4 +1,4 @@
-// src/pages/AdminDashboard.js - CLEAN FIXED VERSION
+// src/pages/AdminDashboard.js - PRESENTATION-READY VERSION
 import React, { useEffect, useState, useContext } from "react";
 import api from "../services/api";
 import { AuthContext } from "../context/AuthContext";
@@ -8,86 +8,159 @@ import "./AdminDashboard.css";
 const API_BASE_URL = "/api/complaints";
 
 function AdminDashboard() {
-  const { logout } = useContext(AuthContext);
+  const { auth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [openComplaints, setOpenComplaints] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [stats, setStats] = useState({ openCount: 0, resolvedCount: 0, avgResolutionDays: 0 });
   const [staffMembers, setStaffMembers] = useState([]);
   const [selectedStaff, setSelectedStaff] = useState("");
   const [pendingApplications, setPendingApplications] = useState([]);
+  const [backendStatus, setBackendStatus] = useState("checking");
 
   const loadDashboard = async () => {
     try {
       setLoading(true);
       setError("");
+      setBackendStatus("connecting");
 
-      // Load stats
+      console.log("🔄 Loading Admin Dashboard...");
+      console.log("Auth Token:", auth?.token ? "Present" : "Missing");
+      console.log("User Role:", auth?.user?.role);
+
+      // Test backend connection first
       try {
-        const statsRes = await api.get(`${API_BASE_URL}/stats`);
-        if (statsRes.data.success) {
-          const stats = statsRes.data.stats;
-          setStats({
-            openCount: (stats.byStatus?.NEW || 0) + (stats.byStatus?.OPEN || 0) + (stats.byStatus?.IN_PROGRESS || 0),
-            resolvedCount: stats.byStatus?.RESOLVED || 0,
-            avgResolutionDays: 0
-          });
-        }
-      } catch (statsError) {
-        console.log("Stats error:", statsError.message);
+        const healthCheck = await api.get('/api/complaints');
+        setBackendStatus("connected");
+        console.log("✅ Backend connection successful");
+      } catch (healthError) {
+        setBackendStatus("failed");
+        console.error("❌ Backend connection failed:", healthError);
+        setError(`Backend connection failed: ${healthError.message}. Check if backend is running on port 8080.`);
+        return;
       }
 
-      // Load all complaints
+      // Load stats with error handling
+      try {
+        const statsRes = await api.get(`${API_BASE_URL}/stats`);
+        console.log("Stats response:", statsRes.data);
+        
+        if (statsRes.data && statsRes.data.success) {
+          const statsData = statsRes.data.stats;
+          setStats({
+            openCount: (statsData.byStatus?.NEW || 0) + (statsData.byStatus?.OPEN || 0) + (statsData.byStatus?.IN_PROGRESS || 0),
+            resolvedCount: statsData.byStatus?.RESOLVED || 0,
+            avgResolutionDays: 0
+          });
+          console.log("✅ Stats loaded successfully");
+        } else {
+          console.log("⚠️ Stats API returned unexpected format");
+          setStats({ openCount: 0, resolvedCount: 0, avgResolutionDays: 0 });
+        }
+      } catch (statsError) {
+        console.log("⚠️ Stats loading failed:", statsError.message);
+        setStats({ openCount: 0, resolvedCount: 0, avgResolutionDays: 0 });
+      }
+
+      // Load all complaints with error handling
       try {
         const complaintsRes = await api.get(`${API_BASE_URL}`);
+        console.log("Complaints response:", complaintsRes.data);
+        
         if (Array.isArray(complaintsRes.data)) {
-          const openComplaints = complaintsRes.data.filter(c => 
+          const allComplaints = complaintsRes.data;
+          const openComplaints = allComplaints.filter(c => 
             c.status === 'New' || c.status === 'Open' || c.status === 'In Progress' || c.status === 'Under Review'
           );
           setOpenComplaints(openComplaints);
+          console.log(`✅ Loaded ${openComplaints.length} open complaints out of ${allComplaints.length} total`);
+        } else {
+          console.log("⚠️ Complaints API returned unexpected format");
+          setOpenComplaints([]);
         }
       } catch (complaintsError) {
-        console.log("Complaints error:", complaintsError.message);
+        console.log("⚠️ Complaints loading failed:", complaintsError.message);
+        setOpenComplaints([]);
       }
 
-      // Load staff members
+      // Load staff members with error handling
       try {
         const staffRes = await api.get(`${API_BASE_URL}/staff`);
-        setStaffMembers(Array.isArray(staffRes.data) ? staffRes.data : []);
+        console.log("Staff response:", staffRes.data);
+        
+        if (Array.isArray(staffRes.data)) {
+          setStaffMembers(staffRes.data);
+          console.log(`✅ Loaded ${staffRes.data.length} staff members`);
+        } else {
+          console.log("⚠️ Staff API returned unexpected format");
+          setStaffMembers([]);
+        }
       } catch (staffError) {
-        console.log("Staff error:", staffError.message);
+        console.log("⚠️ Staff loading failed:", staffError.message);
         setStaffMembers([]);
       }
 
-      // Load pending applications
+      // Load pending applications with error handling
       try {
         const applicationsRes = await api.get('/api/staff-applications/pending');
-        if (applicationsRes.data.success) {
+        console.log("Applications response:", applicationsRes.data);
+        
+        if (applicationsRes.data && applicationsRes.data.success) {
           setPendingApplications(applicationsRes.data.applications || []);
+          console.log(`✅ Loaded ${applicationsRes.data.applications?.length || 0} pending applications`);
+        } else {
+          console.log("⚠️ Applications API returned unexpected format");
+          setPendingApplications([]);
         }
       } catch (appError) {
+        console.log("⚠️ Applications loading failed:", appError.message);
         setPendingApplications([]);
       }
 
+      console.log("✅ Dashboard loading completed");
+
     } catch (e) {
-      setError(`Failed to load: ${e.response?.status} ${e.message}`);
+      console.error("❌ Dashboard loading failed:", e);
+      setError(`Failed to load dashboard: ${e.response?.status || 'Unknown'} - ${e.message}`);
+      setBackendStatus("failed");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    // Check authentication on component mount
+    if (!auth?.token || !auth?.user) {
+      console.log("❌ No authentication found, redirecting to login");
+      navigate("/login");
+      return;
+    }
+
+    if (auth.user.role !== 'ADMIN') {
+      console.log(`❌ Insufficient privileges. User role: ${auth.user.role}`);
+      alert("Admin access required");
+      navigate("/login");
+      return;
+    }
+
+    console.log("✅ Admin authentication verified");
     loadDashboard();
-  }, []);
+  }, [auth, navigate]);
 
   const updateComplaintStatus = async (complaintId, newStatus) => {
     try {
-      await api.put(`${API_BASE_URL}/${complaintId}/status`, { status: newStatus });
-      loadDashboard();
+      console.log(`🔄 Updating complaint ${complaintId} status to ${newStatus}`);
+      
+      const response = await api.put(`${API_BASE_URL}/${complaintId}/status`, { status: newStatus });
+      console.log("Status update response:", response.data);
+      
+      await loadDashboard(); // Reload data
       alert(`✅ Status updated to ${newStatus}!`);
+      console.log(`✅ Complaint ${complaintId} status updated successfully`);
     } catch (e) {
-      alert("❌ Status update failed");
+      console.error(`❌ Status update failed for complaint ${complaintId}:`, e);
+      alert(`❌ Status update failed: ${e.response?.data?.message || e.message}`);
     }
   };
 
@@ -98,31 +171,58 @@ function AdminDashboard() {
     }
     
     try {
-      await api.put(`${API_BASE_URL}/${complaintId}/assign`, {
-        staffId: selectedStaff,
+      console.log(`🔄 Assigning complaint ${complaintId} to staff ${selectedStaff}`);
+      
+      const response = await api.put(`${API_BASE_URL}/${complaintId}/assign`, {
+        staffId: parseInt(selectedStaff),
         status: "IN_PROGRESS"
       });
-      loadDashboard();
+      console.log("Assignment response:", response.data);
+      
+      await loadDashboard(); // Reload data
       alert("✅ Complaint assigned successfully!");
       setSelectedStaff("");
+      console.log(`✅ Complaint ${complaintId} assigned successfully`);
     } catch (e) {
-      alert("❌ Assignment failed");
+      console.error(`❌ Assignment failed for complaint ${complaintId}:`, e);
+      alert(`❌ Assignment failed: ${e.response?.data?.message || e.message}`);
     }
   };
 
   const resolveComplaint = async (complaintId) => {
     try {
-      await api.put(`${API_BASE_URL}/${complaintId}/resolve`);
-      loadDashboard();
+      console.log(`🔄 Resolving complaint ${complaintId}`);
+      
+      const response = await api.put(`${API_BASE_URL}/${complaintId}/resolve`);
+      console.log("Resolve response:", response.data);
+      
+      await loadDashboard(); // Reload data
       alert("✅ Complaint resolved!");
+      console.log(`✅ Complaint ${complaintId} resolved successfully`);
     } catch (e) {
-      alert("❌ Resolve failed");
+      console.error(`❌ Resolve failed for complaint ${complaintId}:`, e);
+      alert(`❌ Resolve failed: ${e.response?.data?.message || e.message}`);
     }
   };
 
   const handleLogout = () => {
+    console.log("🚪 Logging out admin user");
     logout();
     navigate("/login");
+  };
+
+  const handleNavigation = (path, state = null) => {
+    try {
+      console.log(`🔄 Navigating to ${path}`);
+      if (state) {
+        navigate(path, { state });
+      } else {
+        navigate(path);
+      }
+    } catch (e) {
+      console.error(`❌ Navigation failed to ${path}:`, e);
+      alert(`Navigation failed: ${e.message}`);
+    }
   };
 
   return (
@@ -133,14 +233,14 @@ function AdminDashboard() {
           <div className="header-actions">
             <button 
               className="btn btn-success"
-              onClick={() => navigate('/reports')}
+              onClick={() => handleNavigation('/reports')}
               title="View Reports"
             >
               📊 Reports
             </button>
             <button 
               className="btn btn-danger"
-              onClick={() => navigate('/escalations')}
+              onClick={() => handleNavigation('/escalations')}
               title="Manage Escalations"
             >
               🔺 Escalations
@@ -165,10 +265,58 @@ function AdminDashboard() {
       </header>
 
       {error && (
-        <div className="error">
-          ❌ {error}
-          <br />
-          <small>Check F12 Console for details. Backend: http://localhost:8080</small>
+        <div className="error" style={{ 
+          background: '#f8d7da', 
+          border: '1px solid #f5c6cb', 
+          color: '#721c24', 
+          padding: '15px', 
+          borderRadius: '5px', 
+          margin: '20px 0' 
+        }}>
+          <h4>❌ Error Loading Dashboard</h4>
+          <p>{error}</p>
+          <div style={{ marginTop: '10px' }}>
+            <button 
+              className="btn btn-primary" 
+              onClick={loadDashboard}
+              style={{ marginRight: '10px' }}
+            >
+              🔄 Retry
+            </button>
+            <small style={{ display: 'block', marginTop: '10px', color: '#6c757d' }}>
+              <strong>Troubleshooting:</strong><br/>
+              1. Check if backend is running on port 8080<br/>
+              2. Verify MySQL database is running<br/>
+              3. Check browser console (F12) for detailed errors<br/>
+              4. Ensure you're logged in as admin
+            </small>
+          </div>
+        </div>
+      )}
+
+      {backendStatus === "checking" && (
+        <div style={{ 
+          background: '#fff3cd', 
+          border: '1px solid #ffeaa7', 
+          color: '#856404', 
+          padding: '15px', 
+          borderRadius: '5px', 
+          margin: '20px 0' 
+        }}>
+          🔄 Checking backend connection...
+        </div>
+      )}
+
+      {backendStatus === "failed" && !error && (
+        <div style={{ 
+          background: '#f8d7da', 
+          border: '1px solid #f5c6cb', 
+          color: '#721c24', 
+          padding: '15px', 
+          borderRadius: '5px', 
+          margin: '20px 0' 
+        }}>
+          ❌ Backend connection failed. Please ensure the backend server is running on port 8080.
         </div>
       )}
 
@@ -279,13 +427,13 @@ function AdminDashboard() {
                         </button>
                         <button
                           className="btn btn-danger"
-                          onClick={() => navigate('/escalations', { state: { complaintId: complaint.id } })}
+                          onClick={() => handleNavigation('/escalations', { complaintId: complaint.id })}
                         >
                           🔺 Escalate
                         </button>
                         <button
                           className="btn btn-info"
-                          onClick={() => navigate(`/complaints/${complaint.id}`)}
+                          onClick={() => handleNavigation(`/complaints/${complaint.id}`)}
                         >
                           📝 Details
                         </button>

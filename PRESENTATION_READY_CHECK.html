@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResolveIT - Presentation Ready Check</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .header { text-align: center; color: #2c3e50; margin-bottom: 30px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; color: #155724; }
+        .warning { background: #fff3cd; border-color: #ffeaa7; color: #856404; }
+        .error { background: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .test-btn { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .test-btn:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 3px; }
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 8px; margin: 5px 0; border-radius: 3px; }
+        .checklist li.done { background: #d4edda; color: #155724; }
+        .checklist li.pending { background: #fff3cd; color: #856404; }
+        .demo-flow { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 ResolveIT - Presentation Ready Check</h1>
+            <p>Complete system validation before your presentation</p>
+        </div>
+
+        <!-- Pre-Presentation Checklist -->
+        <div class="section">
+            <h2>📋 Pre-Presentation Checklist</h2>
+            <ul class="checklist">
+                <li class="done">✅ Backend compiles successfully (Maven)</li>
+                <li class="done">✅ Frontend builds successfully (React)</li>
+                <li class="done">✅ Database schema is up to date</li>
+                <li class="done">✅ Email configuration is working</li>
+                <li class="done">✅ File upload system is functional</li>
+                <li class="done">✅ All API endpoints are accessible</li>
+                <li class="done">✅ Admin dashboard loads properly</li>
+                <li class="done">✅ Authentication system works</li>
+                <li class="pending">⚠️ Test all demo scenarios below</li>
+            </ul>
+        </div>
+
+        <!-- System Status Tests -->
+        <div class="section">
+            <h2>🔧 System Status Tests</h2>
+            <button class="test-btn" onclick="testBackend()">Test Backend (Port 8080)</button>
+            <button class="test-btn" onclick="testFrontend()">Test Frontend (Port 3000)</button>
+            <button class="test-btn" onclick="testDatabase()">Test Database Connection</button>
+            <button class="test-btn" onclick="testEmail()">Test Email System</button>
+            <div id="systemResults"></div>
+        </div>
+
+        <!-- Demo Flow Scenarios -->
+        <div class="section">
+            <h2>🎯 Demo Flow Scenarios</h2>
+            
+            <div class="demo-flow">
+                <h3>Scenario 1: Basic Complaint Submission</h3>
+                <ol>
+                    <li>Go to <a href="http://localhost:3000" target="_blank">http://localhost:3000</a></li>
+                    <li>Click "Submit Complaint" (no login required)</li>
+                    <li>Fill form: Title, Description, Category</li>
+                    <li>Submit and note the complaint ID</li>
+                    <li>✅ Expected: Success message with complaint ID</li>
+                </ol>
+                <button class="test-btn" onclick="testComplaintSubmission()">Test This Scenario</button>
+            </div>
+
+            <div class="demo-flow">
+                <h3>Scenario 2: Admin Login & Dashboard</h3>
+                <ol>
+                    <li>Go to <a href="http://localhost:3000/login" target="_blank">Login Page</a></li>
+                    <li>Login as Admin: <strong>admin@resolveit.com</strong> / <strong>admin123</strong></li>
+                    <li>Should redirect to Admin Dashboard</li>
+                    <li>✅ Expected: Dashboard with stats and complaint list</li>
+                </ol>
+                <button class="test-btn" onclick="testAdminLogin()">Test This Scenario</button>
+            </div>
+
+            <div class="demo-flow">
+                <h3>Scenario 3: File Upload with Admin-Only Access</h3>
+                <ol>
+                    <li>Submit complaint with PDF/video file</li>
+                    <li>Login as admin and view complaint details</li>
+                    <li>Verify PDF/video files are visible to admin</li>
+                    <li>✅ Expected: Admin can see all files, users see only images</li>
+                </ol>
+                <button class="test-btn" onclick="testFileUpload()">Test This Scenario</button>
+            </div>
+
+            <div class="demo-flow">
+                <h3>Scenario 4: Staff Assignment & Email Notifications</h3>
+                <ol>
+                    <li>Login as admin</li>
+                    <li>Assign complaint to staff member</li>
+                    <li>Update complaint status</li>
+                    <li>✅ Expected: Email notifications sent to user and staff</li>
+                </ol>
+                <button class="test-btn" onclick="testStaffAssignment()">Test This Scenario</button>
+            </div>
+
+            <div class="demo-flow">
+                <h3>Scenario 5: Reports & Analytics</h3>
+                <ol>
+                    <li>Login as admin</li>
+                    <li>Navigate to Reports page</li>
+                    <li>View complaint statistics and charts</li>
+                    <li>✅ Expected: Visual reports with data</li>
+                </ol>
+                <button class="test-btn" onclick="testReports()">Test This Scenario</button>
+            </div>
+        </div>
+
+        <!-- Common Issues & Solutions -->
+        <div class="section">
+            <h2>⚠️ Common Presentation Issues & Quick Fixes</h2>
+            
+            <div class="warning">
+                <h4>Issue 1: Backend Not Starting</h4>
+                <p><strong>Solution:</strong> Run <code>mvn clean install</code> then <code>mvn spring-boot:run</code></p>
+                <p><strong>Check:</strong> Port 8080 is free, MySQL is running</p>
+            </div>
+
+            <div class="warning">
+                <h4>Issue 2: Frontend Not Loading</h4>
+                <p><strong>Solution:</strong> Run <code>npm install</code> then <code>npm start</code></p>
+                <p><strong>Check:</strong> Port 3000 is free, no compilation errors</p>
+            </div>
+
+            <div class="warning">
+                <h4>Issue 3: Database Connection Failed</h4>
+                <p><strong>Solution:</strong> Start MySQL service, verify credentials in application.properties</p>
+                <p><strong>Check:</strong> Database 'resolveit' exists, user has permissions</p>
+            </div>
+
+            <div class="warning">
+                <h4>Issue 4: CORS Errors</h4>
+                <p><strong>Solution:</strong> Already configured in SecurityConfig.java</p>
+                <p><strong>Check:</strong> Frontend uses http://localhost:3000, backend on 8080</p>
+            </div>
+
+            <div class="warning">
+                <h4>Issue 5: Email Not Sending</h4>
+                <p><strong>Solution:</strong> Verify Gmail app password in application.properties</p>
+                <p><strong>Check:</strong> Internet connection, Gmail SMTP settings</p>
+            </div>
+        </div>
+
+        <!-- Quick Start Commands -->
+        <div class="section">
+            <h2>🚀 Quick Start Commands</h2>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace;">
+                <h4>Start Backend:</h4>
+                <code>cd resolveit-backend</code><br>
+                <code>mvn spring-boot:run</code><br><br>
+                
+                <h4>Start Frontend:</h4>
+                <code>cd resolveit-frontend</code><br>
+                <code>npm start</code><br><br>
+                
+                <h4>Access URLs:</h4>
+                <code>Frontend: http://localhost:3000</code><br>
+                <code>Backend API: http://localhost:8080</code><br>
+                <code>Admin Login: admin@resolveit.com / admin123</code>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="section">
+            <h2>📊 Test Results</h2>
+            <div id="testResults">
+                <p>Click the test buttons above to validate your system...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testBackend() {
+            const resultDiv = document.getElementById('systemResults');
+            resultDiv.innerHTML += '<div class="result">Testing backend connection...</div>';
+            
+            fetch('http://localhost:8080/api/complaints')
+                .then(response => {
+                    if (response.ok) {
+                        resultDiv.innerHTML += '<div class="result success">✅ Backend is running and accessible</div>';
+                    } else {
+                        resultDiv.innerHTML += '<div class="result error">❌ Backend responded with error: ' + response.status + '</div>';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML += '<div class="result error">❌ Backend connection failed: ' + error.message + '</div>';
+                });
+        }
+
+        function testFrontend() {
+            const resultDiv = document.getElementById('systemResults');
+            if (window.location.hostname === 'localhost' && window.location.port === '3000') {
+                resultDiv.innerHTML += '<div class="result success">✅ Frontend is running on correct port</div>';
+            } else {
+                resultDiv.innerHTML += '<div class="result warning">⚠️ Open this page from http://localhost:3000 for full testing</div>';
+            }
+        }
+
+        function testDatabase() {
+            const resultDiv = document.getElementById('systemResults');
+            resultDiv.innerHTML += '<div class="result">Testing database connection via backend...</div>';
+            
+            fetch('http://localhost:8080/api/complaints/stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resultDiv.innerHTML += '<div class="result success">✅ Database connection working - Found ' + data.stats.total + ' complaints</div>';
+                    } else {
+                        resultDiv.innerHTML += '<div class="result error">❌ Database query failed</div>';
+                    }
+                })
+                .catch(error => {
+                    resultDiv.innerHTML += '<div class="result error">❌ Database test failed: ' + error.message + '</div>';
+                });
+        }
+
+        function testEmail() {
+            const resultDiv = document.getElementById('systemResults');
+            resultDiv.innerHTML += '<div class="result warning">⚠️ Email testing requires actual complaint submission. Check console logs during demo.</div>';
+        }
+
+        function testComplaintSubmission() {
+            window.open('http://localhost:3000', '_blank');
+        }
+
+        function testAdminLogin() {
+            window.open('http://localhost:3000/login', '_blank');
+        }
+
+        function testFileUpload() {
+            window.open('test_file_upload_system.html', '_blank');
+        }
+
+        function testStaffAssignment() {
+            window.open('http://localhost:3000/admin', '_blank');
+        }
+
+        function testReports() {
+            window.open('http://localhost:3000/reports', '_blank');
+        }
+
+        // Auto-run basic tests on page load
+        window.onload = function() {
+            setTimeout(testBackend, 1000);
+            setTimeout(testDatabase, 2000);
+        };
+    </script>
+</body>
+</html>

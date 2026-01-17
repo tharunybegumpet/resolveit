@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useContext } from "react";
 import api from "../services/api";
 import { AuthContext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const EscalationPage = () => {
   const { auth, logout } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
   
   const [myEscalations, setMyEscalations] = useState([]);
   const [authorities, setAuthorities] = useState([]);
@@ -24,8 +25,18 @@ const EscalationPage = () => {
   const [availableComplaints, setAvailableComplaints] = useState([]);
 
   useEffect(() => {
+    // Check if complaint ID was passed from AdminDashboard
+    if (location.state?.complaintId) {
+      setEscalationForm(prev => ({
+        ...prev,
+        complaintId: location.state.complaintId.toString()
+      }));
+      setShowEscalationForm(true);
+      console.log(`✅ Auto-selected complaint ID: ${location.state.complaintId}`);
+    }
+    
     loadEscalationData();
-  }, []);
+  }, [location.state]);
 
   const loadEscalationData = async () => {
     try {
@@ -327,6 +338,18 @@ const EscalationPage = () => {
             <div style={{ marginBottom: "20px" }}>
               <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
                 Select Complaint:
+                {location.state?.complaintId && (
+                  <span style={{ 
+                    color: "#28a745", 
+                    fontSize: "12px", 
+                    marginLeft: "10px",
+                    background: "#d4edda",
+                    padding: "2px 8px",
+                    borderRadius: "3px"
+                  }}>
+                    ✅ Pre-selected from Admin Dashboard
+                  </span>
+                )}
               </label>
               <select
                 value={escalationForm.complaintId}
@@ -335,8 +358,9 @@ const EscalationPage = () => {
                   width: "100%",
                   padding: "10px",
                   borderRadius: "4px",
-                  border: "1px solid #ced4da",
-                  fontSize: "14px"
+                  border: location.state?.complaintId ? "2px solid #28a745" : "1px solid #ced4da",
+                  fontSize: "14px",
+                  background: location.state?.complaintId ? "#f8fff9" : "white"
                 }}
                 required
               >
