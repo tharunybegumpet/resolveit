@@ -211,6 +211,21 @@ function AdminDashboard() {
     navigate("/login");
   };
 
+  const handleApplicationAction = async (applicationId, action) => {
+    try {
+      console.log(`🔄 ${action} application ${applicationId}`);
+      
+      const response = await api.put(`/api/staff-applications/${applicationId}/${action.toLowerCase()}`);
+      console.log("Application action response:", response.data);
+      
+      await loadDashboard(); // Reload data
+      alert(`✅ Application ${action.toLowerCase()} successfully!`);
+    } catch (e) {
+      console.error(`❌ Application ${action} failed:`, e);
+      alert(`❌ Failed to ${action.toLowerCase()} application: ${e.response?.data?.message || e.message}`);
+    }
+  };
+
   const handleNavigation = (path, state = null) => {
     try {
       console.log(`🔄 Navigating to ${path}`);
@@ -438,6 +453,58 @@ function AdminDashboard() {
                           📝 Details
                         </button>
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Pending Staff Applications */}
+          <section className="staff-applications-section">
+            <h2>Pending Staff Applications ({pendingApplications.length})</h2>
+            {pendingApplications.length === 0 ? (
+              <p className="no-data">No pending staff applications.</p>
+            ) : (
+              <div className="applications-grid">
+                {pendingApplications.map((application) => (
+                  <div key={application.id} className="application-card">
+                    <div className="application-header">
+                      <h4>{application.applicantName || 'Unknown Applicant'}</h4>
+                      <div className="status-badge pending">PENDING</div>
+                    </div>
+                    
+                    <div className="application-content">
+                      <div className="application-meta">
+                        <span><strong>Email:</strong> {application.applicantEmail || 'N/A'}</span>
+                        <span><strong>Experience:</strong> {application.experience || 'N/A'}</span>
+                        <span><strong>Availability:</strong> {application.availability || 'N/A'}</span>
+                        <span><strong>Applied:</strong> {application.createdAt ? new Date(application.createdAt).toLocaleDateString() : 'Recent'}</span>
+                      </div>
+                      
+                      <div className="application-details">
+                        <p><strong>Skills:</strong> {application.skills || 'Not specified'}</p>
+                        <p><strong>Motivation:</strong> {application.motivation || 'Not provided'}</p>
+                        {application.previousExperience && (
+                          <p><strong>Previous Experience:</strong> {application.previousExperience}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="application-actions">
+                      <button
+                        className="btn btn-success"
+                        onClick={() => handleApplicationAction(application.id, 'APPROVED')}
+                        style={{ marginRight: '10px' }}
+                      >
+                        ✅ Approve
+                      </button>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleApplicationAction(application.id, 'REJECTED')}
+                      >
+                        ❌ Reject
+                      </button>
                     </div>
                   </div>
                 ))}

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Test Staff Applications</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .sql-code { background: #f8f9fa; padding: 15px; border-radius: 5px; font-family: monospace; margin: 10px 0; border: 1px solid #dee2e6; }
+        .step { background: #e3f2fd; padding: 15px; border-radius: 5px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧑‍💼 Add Test Staff Applications</h1>
+        
+        <div class="success">
+            <h3>✅ Fix for Staff Applications Not Showing</h3>
+            <p>The issue is that there are no staff applications in the database to display. Let's add some test data!</p>
+        </div>
+
+        <div class="step">
+            <h3>📋 Step 1: Run SQL Script</h3>
+            <p>Execute this SQL script in your MySQL database to add test staff applications:</p>
+            
+            <div class="sql-code">
+-- Insert test users and staff applications<br>
+INSERT IGNORE INTO users (username, email, password, full_name, role) VALUES<br>
+('testuser1', 'testuser1@resolveit.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'John Smith', 'USER'),<br>
+('testuser2', 'testuser2@resolveit.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Sarah Johnson', 'USER'),<br>
+('testuser3', 'testuser3@resolveit.com', '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'Mike Davis', 'USER');<br><br>
+
+INSERT INTO staff_applications (user_id, categories, experience, skills, availability, motivation, previous_experience, status, created_at) VALUES<br>
+((SELECT id FROM users WHERE email = 'testuser1@resolveit.com'), '["Technical Issues", "Website/App Issues"]', '3-5 years', 'Problem-solving, Java, Spring Boot', 'Full-time (40+ hours/week)', 'I want to help users with technical issues', 'Technical support for 4 years', 'PENDING', NOW()),<br>
+((SELECT id FROM users WHERE email = 'testuser2@resolveit.com'), '["General Inquiries", "Services"]', '1-3 years', 'Communication, Customer service', 'Part-time (20-30 hours/week)', 'I enjoy helping people', 'Customer service for 2 years', 'PENDING', DATE_SUB(NOW(), INTERVAL 1 DAY)),<br>
+((SELECT id FROM users WHERE email = 'testuser3@resolveit.com'), '["Technical Issues", "Infrastructure"]', '5+ years', 'System administration, Linux', 'Full-time (40+ hours/week)', 'I have extensive technical background', 'System Administrator for 6 years', 'PENDING', DATE_SUB(NOW(), INTERVAL 2 DAY));
+            </div>
+        </div>
+
+        <div class="step">
+            <h3>🔧 Step 2: How to Run the SQL</h3>
+            <p><strong>Option 1: MySQL Command Line</strong></p>
+            <div class="sql-code">
+mysql -u root -p resolveit < insert_test_staff_applications.sql
+            </div>
+            
+            <p><strong>Option 2: MySQL Workbench/phpMyAdmin</strong></p>
+            <ol>
+                <li>Open MySQL Workbench or phpMyAdmin</li>
+                <li>Select the 'resolveit' database</li>
+                <li>Copy and paste the SQL code above</li>
+                <li>Execute the query</li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>📊 Step 3: Verify in Admin Dashboard</h3>
+            <ol>
+                <li>Start your backend: <code>mvn spring-boot:run</code></li>
+                <li>Start your frontend: <code>npm start</code></li>
+                <li>Login as admin: <strong>admin@resolveit.com</strong> / <strong>admin123</strong></li>
+                <li>Check the "Pending Applications" count in the stats</li>
+                <li>It should show <strong>3</strong> instead of <strong>0</strong></li>
+            </ol>
+        </div>
+
+        <div class="step">
+            <h3>🎯 Expected Result</h3>
+            <p>After running the SQL script, your admin dashboard will show:</p>
+            <ul>
+                <li>✅ <strong>Pending Applications: 3</strong></li>
+                <li>✅ Three test staff applications from John Smith, Sarah Johnson, and Mike Davis</li>
+                <li>✅ Different experience levels and skills</li>
+                <li>✅ Realistic application data for demo purposes</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h3>🚀 Bonus: Add Staff Applications Display Section</h3>
+            <p>I can also add a section to the admin dashboard to show the actual applications list, not just the count. Would you like me to do that?</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <h3 style="color: #28a745;">🎉 Staff Applications Will Now Be Visible! 🎉</h3>
+        </div>
+    </div>
+</body>
+</html>
