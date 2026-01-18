@@ -215,7 +215,9 @@ function AdminDashboard() {
     try {
       console.log(`🔄 ${action} application ${applicationId}`);
       
-      const response = await api.put(`/api/staff-applications/${applicationId}/${action.toLowerCase()}`);
+      // Fix the endpoint URL - remove 'd' from approved/rejected
+      const endpoint = action === 'APPROVED' ? 'approve' : 'reject';
+      const response = await api.put(`/api/staff-applications/${applicationId}/${endpoint}`);
       console.log("Application action response:", response.data);
       
       await loadDashboard(); // Reload data
