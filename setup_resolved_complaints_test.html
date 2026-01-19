@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Resolved Complaints Test Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .step {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.success {
+            background-color: #28a745;
+        }
+        button.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .sql-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Setup Resolved Complaints Test Data</h1>
+        <p>This tool helps you create test data for the resolved complaints feature and test the API endpoints.</p>
+
+        <!-- Step 1: Create Test Data -->
+        <div class="step">
+            <h3>📝 Step 1: Create Test Resolved Complaints</h3>
+            <p>Execute the SQL script to create sample resolved and closed complaints.</p>
+            
+            <div class="sql-box">-- SQL Script Content:
+-- Creates 5 test complaints with RESOLVED and CLOSED status
+-- Assigns them to staff members if available
+-- Shows the created complaints for verification</div>
+            
+            <button onclick="createTestData()">🔨 Create Test Data</button>
+            <button class="warning" onclick="showSQL()">📄 Show SQL Script</button>
+            <div id="createResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 2: Login -->
+        <div class="step">
+            <h3>🔑 Step 2: Login for API Testing</h3>
+            <p>Login to get authentication token for testing the resolved complaints API.</p>
+            <input type="email" id="email" placeholder="Email" value="admin@resolveit.com" style="padding: 8px; margin: 5px; width: 200px;">
+            <input type="password" id="password" placeholder="Password" value="admin123" style="padding: 8px; margin: 5px; width: 200px;">
+            <button onclick="login()">🔐 Login</button>
+            <div id="loginResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 3: Test API Endpoints -->
+        <div class="step">
+            <h3>🧪 Step 3: Test Resolved Complaints API</h3>
+            <p>Test the resolved complaints endpoints to verify they work correctly.</p>
+            
+            <button class="success" onclick="testAllResolved()">📋 Test All Resolved</button>
+            <button onclick="testResolvedOnly()">✅ Test Resolved Only</button>
+            <button onclick="testClosedOnly()">🔒 Test Closed Only</button>
+            <div id="apiResult" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Step 4: Test Frontend -->
+        <div class="step">
+            <h3>🖥️ Step 4: Test Frontend Component</h3>
+            <p>Open the resolved complaints page in your React application.</p>
+            
+            <button onclick="openFrontend()">🌐 Open Resolved Complaints Page</button>
+            <div class="info" style="margin-top: 10px;">
+                <strong>Frontend URL:</strong> http://localhost:3000/resolved-complaints<br>
+                <strong>Note:</strong> Make sure your React frontend is running on port 3000
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('token') || '';
+        const API_BASE = 'http://localhost:8080';
+
+        // Update UI if already logged in
+        if (authToken) {
+            document.getElementById('loginResult').style.display = 'block';
+            document.getElementById('loginResult').className = 'result success';
+            document.getElementById('loginResult').textContent = '✅ Already logged in with token: ' + authToken.substring(0, 20) + '...';
+        }
+
+        function showSQL() {
+            const sqlContent = `-- Create test complaints with RESOLVED and CLOSED status for testing
+-- This script creates sample resolved complaints to test the resolved complaints feature
+
+-- First, let's check current status codes
+SELECT 'Current Status Codes:' as info;
+SELECT id, code, display FROM complaint_status ORDER BY id;
+
+-- Get RESOLVED and CLOSED status IDs
+SET @resolved_status_id = (SELECT id FROM complaint_status WHERE code = 'RESOLVED' LIMIT 1);
+SET @closed_status_id = (SELECT id FROM complaint_status WHERE code = 'CLOSED' LIMIT 1);
+
+-- Insert test resolved complaints
+INSERT INTO complaints (title, description, user_id, status_id, anonymous, created_at, updated_at) VALUES
+('Resolved: Email Notification Issue', 'Email notifications were not working properly. Issue has been fixed by updating SMTP configuration.', 1, @resolved_status_id, false, DATE_SUB(NOW(), INTERVAL 5 DAY), NOW()),
+('Resolved: Database Connection Problem', 'Database connection was timing out. Resolved by optimizing connection pool settings.', 2, @resolved_status_id, false, DATE_SUB(NOW(), INTERVAL 3 DAY), NOW()),
+('Closed: Duplicate Account Request', 'User requested duplicate account creation. Closed as user already has an active account.', 1, @closed_status_id, false, DATE_SUB(NOW(), INTERVAL 7 DAY), NOW()),
+('Resolved: File Upload Size Limit', 'Users unable to upload large files. Resolved by increasing file size limit to 10MB.', 3, @resolved_status_id, false, DATE_SUB(NOW(), INTERVAL 2 DAY), NOW()),
+('Closed: Spam Report', 'Report about spam content. Closed after investigation - content was legitimate.', 2, @closed_status_id, false, DATE_SUB(NOW(), INTERVAL 1 DAY), NOW());
+
+-- Assign some complaints to staff members (if staff exists)
+UPDATE complaints 
+SET assigned_to = (SELECT id FROM users WHERE role = 'STAFF' LIMIT 1)
+WHERE title LIKE 'Resolved:%' OR title LIKE 'Closed:%';
+
+-- Show the created resolved complaints
+SELECT 'Created Resolved/Closed Complaints:' as info;
+SELECT 
+    c.id,
+    c.title,
+    c.description,
+    u.full_name as raised_by,
+    cs.display as status,
+    cs.code as status_code,
+    staff.full_name as assigned_to,
+    c.created_at,
+    c.updated_at
+FROM complaints c
+LEFT JOIN users u ON c.user_id = u.id
+LEFT JOIN complaint_status cs ON c.status_id = cs.id
+LEFT JOIN users staff ON c.assigned_to = staff.id
+WHERE cs.code IN ('RESOLVED', 'CLOSED')
+ORDER BY c.updated_at DESC;
+
+-- Show total count
+SELECT 
+    cs.display as status,
+    COUNT(*) as count
+FROM complaints c
+JOIN complaint_status cs ON c.status_id = cs.id
+WHERE cs.code IN ('RESOLVED', 'CLOSED')
+GROUP BY cs.display;`;
+
+            const resultDiv = document.getElementById('createResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result info';
+            resultDiv.textContent = sqlContent;
+        }
+
+        function createTestData() {
+            const resultDiv = document.getElementById('createResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result info';
+            resultDiv.textContent = `📝 To create test data, please:
+
+1. Open your MySQL client (MySQL Workbench, phpMyAdmin, or command line)
+2. Connect to your resolveit database
+3. Copy and execute the SQL script shown above (click "Show SQL Script" button)
+4. Verify the data was created successfully
+5. Come back here and test the API endpoints
+
+The script will create 5 test complaints:
+- 3 with RESOLVED status
+- 2 with CLOSED status
+- All assigned to staff members (if available)
+- With realistic timestamps (1-7 days ago)
+
+✅ After running the SQL script, proceed to Step 2 (Login) and Step 3 (Test API).`;
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                
+                if (data.status === 'success') {
+                    authToken = data.token;
+                    localStorage.setItem('token', authToken);
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Login successful!
+Token: ${authToken.substring(0, 50)}...
+User: ${data.user.name} (${data.user.role})
+
+🎉 You can now test the API endpoints in Step 3!`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Login failed: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Login error: ${error.message}`;
+            }
+        }
+
+        async function testAllResolved() {
+            await testEndpoint('/api/complaints/resolved', 'All Resolved Complaints');
+        }
+
+        async function testResolvedOnly() {
+            await testEndpoint('/api/complaints/resolved/resolved', 'Resolved Status Only');
+        }
+
+        async function testClosedOnly() {
+            await testEndpoint('/api/complaints/resolved/closed', 'Closed Status Only');
+        }
+
+        async function testEndpoint(endpoint, testName) {
+            const resultDiv = document.getElementById('apiResult');
+            
+            if (!authToken) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ Please login first to get authentication token (Step 2)';
+                return;
+            }
+
+            try {
+                console.log(`🔄 Testing ${testName}: ${endpoint}`);
+                
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    let resultText = `✅ ${testName} - SUCCESS!
+Status: ${response.status}
+Count: ${data.count}
+Message: ${data.message}
+
+`;
+                    
+                    if (data.complaints && data.complaints.length > 0) {
+                        resultText += `📋 Found ${data.complaints.length} resolved complaints:
+
+`;
+                        data.complaints.forEach((complaint, index) => {
+                            resultText += `${index + 1}. [ID: ${complaint.id}] ${complaint.title}
+   Status: ${complaint.status} (${complaint.statusCode || 'N/A'})
+   Category: ${complaint.category}
+   Created: ${new Date(complaint.createdAt).toLocaleString()}
+   Updated: ${new Date(complaint.updatedAt).toLocaleString()}
+   User: ${complaint.user ? complaint.user.name : 'Anonymous'}
+   Assigned To: ${complaint.assignedTo ? complaint.assignedTo.name : 'Unassigned'}
+   Files: ${complaint.hasFiles ? complaint.fileCount + ' file(s)' : 'No files'}
+   ---
+`;
+                        });
+                        
+                        resultText += `
+🎉 RESOLVED COMPLAINTS FEATURE IS WORKING!
+✅ Backend API endpoints are functional
+✅ Authentication is working
+✅ Data is being retrieved correctly
+✅ Frontend can now display this data
+
+Next: Test the frontend component in Step 4!`;
+                    } else {
+                        resultText += `📭 No resolved complaints found.
+
+This means either:
+1. No complaints have been resolved yet
+2. The test data wasn't created (run Step 1 first)
+3. The database doesn't have RESOLVED/CLOSED status codes
+
+💡 Make sure to create test data in Step 1 first!`;
+                    }
+                    
+                    resultDiv.textContent = resultText;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ ${testName} - FAILED!
+Status: ${response.status}
+Error: ${data.message}
+Full Response: ${JSON.stringify(data, null, 2)}
+
+🔧 Troubleshooting:
+1. Make sure backend server is running on port 8080
+2. Verify you're logged in (Step 2)
+3. Check if test data exists (Step 1)
+4. Verify database connection`;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ ${testName} - ERROR: ${error.message}
+
+🔧 Troubleshooting:
+1. Is the backend server running? (http://localhost:8080)
+2. Is the database connected?
+3. Are you logged in with valid credentials?`;
+            }
+        }
+
+        function openFrontend() {
+            window.open('http://localhost:3000/resolved-complaints', '_blank');
+        }
+
+        // Auto-test if already logged in
+        if (authToken) {
+            console.log('🔄 Ready to test with existing token...');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Resolved Complaints Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .result { margin: 10px 0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🚀 Quick Resolved Complaints Test</h1>
+    
+    <button onclick="runQuickTest()">▶️ RUN QUICK TEST</button>
+    <button onclick="openResolvedPage()">🌐 Open Resolved Page</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        let token = '';
+
+        async function runQuickTest() {
+            const resultDiv = document.getElementById('result');
+            let log = '';
+
+            try {
+                // Step 1: Login
+                log += '🔐 Logging in...\n';
+                const loginResponse = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: 'admin@resolveit.com', password: 'admin123' })
+                });
+                
+                const loginData = await loginResponse.json();
+                if (loginData.status !== 'success') throw new Error('Login failed');
+                
+                token = loginData.token;
+                log += '✅ Login successful\n\n';
+
+                // Step 2: Get existing complaints
+                log += '📋 Getting existing complaints...\n';
+                const complaintsResponse = await fetch(`${API_BASE}/api/complaints`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const complaints = await complaintsResponse.json();
+                log += `Found ${complaints.length} complaints\n\n`;
+
+                // Step 3: Create test complaints if needed
+                if (complaints.length < 3) {
+                    log += '🔨 Creating test complaints...\n';
+                    await createTestComplaint('Email Issue Fixed', 'Email notifications working now');
+                    await createTestComplaint('Database Problem Resolved', 'Database connection optimized');
+                    await createTestComplaint('User Account Issue Closed', 'Account access restored');
+                    log += '✅ Test complaints created\n\n';
+                }
+
+                // Step 4: Resolve some complaints
+                log += '✅ Resolving complaints...\n';
+                const updatedComplaints = await fetch(`${API_BASE}/api/complaints`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(r => r.json());
+
+                let resolvedCount = 0;
+                for (let i = 0; i < Math.min(3, updatedComplaints.length); i++) {
+                    const complaint = updatedComplaints[i];
+                    const status = i % 2 === 0 ? 'RESOLVED' : 'CLOSED';
+                    
+                    await fetch(`${API_BASE}/api/complaints/${complaint.id}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ status })
+                    });
+                    resolvedCount++;
+                }
+                log += `✅ Resolved ${resolvedCount} complaints\n\n`;
+
+                // Step 5: Test resolved complaints API
+                log += '🧪 Testing resolved complaints API...\n';
+                const resolvedResponse = await fetch(`${API_BASE}/api/complaints/resolved`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                const resolvedData = await resolvedResponse.json();
+                
+                if (resolvedData.success) {
+                    log += `✅ API SUCCESS! Found ${resolvedData.count} resolved complaints\n\n`;
+                    
+                    if (resolvedData.complaints && resolvedData.complaints.length > 0) {
+                        log += '📋 Resolved Complaints:\n';
+                        resolvedData.complaints.forEach((c, i) => {
+                            log += `${i+1}. [${c.statusCode}] ${c.title}\n`;
+                        });
+                        log += '\n';
+                    }
+                    
+                    log += '🎉 RESOLVED COMPLAINTS FEATURE IS WORKING!\n\n';
+                    log += '✅ Backend API: Working\n';
+                    log += '✅ Authentication: Working\n';
+                    log += '✅ Test Data: Created\n';
+                    log += '✅ Endpoints: Functional\n\n';
+                    log += '🌐 Frontend: Click "Open Resolved Page" to test React component\n';
+                    log += '📱 Or go to: http://localhost:3000/resolved-complaints\n';
+                    
+                    resultDiv.className = 'result success';
+                } else {
+                    throw new Error(resolvedData.message || 'API failed');
+                }
+
+            } catch (error) {
+                log += `❌ ERROR: ${error.message}\n`;
+                resultDiv.className = 'result error';
+            }
+            
+            resultDiv.textContent = log;
+        }
+
+        async function createTestComplaint(title, description) {
+            await fetch(`${API_BASE}/api/complaints`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title,
+                    description,
+                    category: 'Technical',
+                    anonymous: false
+                })
+            });
+        }
+
+        function openResolvedPage() {
+            window.open('http://localhost:3000/resolved-complaints', '_blank');
+        }
+    </script>
+</body>
+</html>

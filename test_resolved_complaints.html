@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Resolved Complaints API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button.success {
+            background-color: #28a745;
+        }
+        button.info {
+            background-color: #17a2b8;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .complaint-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background-color: white;
+        }
+        .complaint-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-resolved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-closed {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Resolved Complaints API Test</h1>
+        <p>Test the new resolved complaints endpoints</p>
+
+        <!-- Test Section 1: Get All Resolved Complaints -->
+        <div class="test-section">
+            <h3>📋 Test 1: Get All Resolved Complaints</h3>
+            <p>Tests: <code>GET /api/complaints/resolved</code></p>
+            <button onclick="testAllResolvedComplaints()">🔍 Get All Resolved</button>
+            <div id="result1" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Test Section 2: Get Resolved Only -->
+        <div class="test-section">
+            <h3>✅ Test 2: Get RESOLVED Status Only</h3>
+            <p>Tests: <code>GET /api/complaints/resolved/resolved</code></p>
+            <button class="success" onclick="testResolvedOnly()">✅ Get Resolved Only</button>
+            <div id="result2" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Test Section 3: Get Closed Only -->
+        <div class="test-section">
+            <h3>🔒 Test 3: Get CLOSED Status Only</h3>
+            <p>Tests: <code>GET /api/complaints/resolved/closed</code></p>
+            <button class="info" onclick="testClosedOnly()">🔒 Get Closed Only</button>
+            <div id="result3" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Test Section 4: Authentication Test -->
+        <div class="test-section">
+            <h3>🔐 Test 4: Authentication Required</h3>
+            <p>Tests API without authentication (should fail)</p>
+            <button onclick="testWithoutAuth()">🚫 Test Without Auth</button>
+            <div id="result4" class="result" style="display: none;"></div>
+        </div>
+
+        <!-- Login Section -->
+        <div class="test-section">
+            <h3>🔑 Login for Testing</h3>
+            <p>Login to get authentication token for API testing</p>
+            <input type="email" id="email" placeholder="Email" value="admin@resolveit.com" style="padding: 8px; margin: 5px; width: 200px;">
+            <input type="password" id="password" placeholder="Password" value="admin123" style="padding: 8px; margin: 5px; width: 200px;">
+            <button onclick="login()">🔐 Login</button>
+            <div id="loginResult" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        let authToken = localStorage.getItem('token') || '';
+        const API_BASE = 'http://localhost:8080';
+
+        // Update UI if already logged in
+        if (authToken) {
+            document.getElementById('loginResult').style.display = 'block';
+            document.getElementById('loginResult').className = 'result success';
+            document.getElementById('loginResult').textContent = '✅ Already logged in with token: ' + authToken.substring(0, 20) + '...';
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('loginResult');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                
+                if (data.status === 'success') {
+                    authToken = data.token;
+                    localStorage.setItem('token', authToken);
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Login successful!\nToken: ${authToken.substring(0, 50)}...\nUser: ${data.user.name} (${data.user.role})`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Login failed: ${data.message}`;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Login error: ${error.message}`;
+            }
+        }
+
+        async function testAllResolvedComplaints() {
+            await testEndpoint('/api/complaints/resolved', 'result1', 'All Resolved Complaints');
+        }
+
+        async function testResolvedOnly() {
+            await testEndpoint('/api/complaints/resolved/resolved', 'result2', 'Resolved Status Only');
+        }
+
+        async function testClosedOnly() {
+            await testEndpoint('/api/complaints/resolved/closed', 'result3', 'Closed Status Only');
+        }
+
+        async function testWithoutAuth() {
+            const resultDiv = document.getElementById('result4');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/complaints/resolved`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // No Authorization header
+                    }
+                });
+
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                
+                if (response.status === 401) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Authentication test passed!\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Authentication test failed - should have returned 401\nStatus: ${response.status}\nResponse: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Test error: ${error.message}`;
+            }
+        }
+
+        async function testEndpoint(endpoint, resultId, testName) {
+            const resultDiv = document.getElementById(resultId);
+            
+            if (!authToken) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '❌ Please login first to get authentication token';
+                return;
+            }
+
+            try {
+                console.log(`🔄 Testing ${testName}: ${endpoint}`);
+                
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                resultDiv.style.display = 'block';
+                
+                if (data.success) {
+                    resultDiv.className = 'result success';
+                    let resultText = `✅ ${testName} - Success!\n`;
+                    resultText += `Status: ${response.status}\n`;
+                    resultText += `Count: ${data.count}\n`;
+                    resultText += `Message: ${data.message}\n\n`;
+                    
+                    if (data.complaints && data.complaints.length > 0) {
+                        resultText += `📋 Complaints (${data.complaints.length}):\n`;
+                        data.complaints.forEach((complaint, index) => {
+                            resultText += `\n${index + 1}. ID: ${complaint.id}\n`;
+                            resultText += `   Title: ${complaint.title}\n`;
+                            resultText += `   Status: ${complaint.status} (${complaint.statusCode})\n`;
+                            resultText += `   Category: ${complaint.category}\n`;
+                            resultText += `   Created: ${new Date(complaint.createdAt).toLocaleString()}\n`;
+                            resultText += `   Updated: ${new Date(complaint.updatedAt).toLocaleString()}\n`;
+                            resultText += `   Anonymous: ${complaint.anonymous}\n`;
+                            if (complaint.user) {
+                                resultText += `   User: ${complaint.user.name} (${complaint.user.email})\n`;
+                            }
+                            if (complaint.assignedTo) {
+                                resultText += `   Assigned To: ${complaint.assignedTo.name}\n`;
+                            }
+                            if (complaint.hasFiles) {
+                                resultText += `   Files: ${complaint.fileCount} file(s)\n`;
+                            }
+                            resultText += `   ---\n`;
+                        });
+                    } else {
+                        resultText += `\n📭 No complaints found.`;
+                    }
+                    
+                    resultDiv.textContent = resultText;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ ${testName} - Failed!\nStatus: ${response.status}\nError: ${data.message}\nFull Response: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.style.display = 'block';
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ ${testName} - Error: ${error.message}`;
+            }
+        }
+
+        // Auto-test if already logged in
+        if (authToken) {
+            console.log('🔄 Auto-testing with existing token...');
+        }
+    </script>
+</body>
+</html>

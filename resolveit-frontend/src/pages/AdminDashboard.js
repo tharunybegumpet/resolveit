@@ -256,6 +256,13 @@ function AdminDashboard() {
               📊 Reports
             </button>
             <button 
+              className="btn btn-info"
+              onClick={() => handleNavigation('/resolved-complaints')}
+              title="View Resolved Complaints"
+            >
+              ✅ Resolved
+            </button>
+            <button 
               className="btn btn-danger"
               onClick={() => handleNavigation('/escalations')}
               title="Manage Escalations"

@@ -756,6 +756,155 @@ public class ComplaintController {
         }
     }
 
+    /**
+     * Get all resolved complaints with details
+     */
+    @GetMapping("/resolved")
+    public ResponseEntity<?> getResolvedComplaints(@RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            // Validate authentication
+            User currentUser = validateAndGetCurrentUser(authHeader);
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "Authentication required"));
+            }
+
+            // Find resolved complaints
+            List<Complaint> resolvedComplaints = complaintRepository.findAll().stream()
+                .filter(complaint -> {
+                    if (complaint.getStatus() == null) return false;
+                    String statusCode = complaint.getStatus().getCode();
+                    return "RESOLVED".equals(statusCode) || "CLOSED".equals(statusCode);
+                })
+                .collect(Collectors.toList());
+
+            // Convert to detailed response format
+            List<Map<String, Object>> complaintDetails = resolvedComplaints.stream().map(complaint -> {
+                Map<String, Object> details = new HashMap<>();
+                details.put("id", complaint.getId());
+                details.put("title", complaint.getTitle());
+                details.put("description", complaint.getDescription());
+                details.put("category", complaint.getCategory());
+                details.put("status", complaint.getStatus().getDisplay());
+                details.put("statusCode", complaint.getStatus().getCode());
+                details.put("anonymous", complaint.isAnonymous());
+                details.put("createdAt", complaint.getCreatedAt());
+                details.put("updatedAt", complaint.getUpdatedAt());
+                
+                // Add user details if not anonymous
+                if (!complaint.isAnonymous() && complaint.getUser() != null) {
+                    Map<String, Object> userDetails = new HashMap<>();
+                    userDetails.put("id", complaint.getUser().getId());
+                    userDetails.put("name", complaint.getUser().getFullName());
+                    userDetails.put("email", complaint.getUser().getEmail());
+                    details.put("user", userDetails);
+                } else {
+                    details.put("user", null);
+                }
+                
+                // Add assigned staff details
+                if (complaint.getAssignedTo() != null) {
+                    Map<String, Object> staffDetails = new HashMap<>();
+                    staffDetails.put("id", complaint.getAssignedTo().getId());
+                    staffDetails.put("name", complaint.getAssignedTo().getFullName());
+                    staffDetails.put("email", complaint.getAssignedTo().getEmail());
+                    details.put("assignedTo", staffDetails);
+                } else {
+                    details.put("assignedTo", null);
+                }
+                
+                // Add file attachments count
+                List<ComplaintFile> files = complaintFileRepository.findByComplaintId(complaint.getId());
+                details.put("fileCount", files.size());
+                details.put("hasFiles", !files.isEmpty());
+                
+                return details;
+            }).collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Resolved complaints retrieved successfully");
+            response.put("count", complaintDetails.size());
+            response.put("complaints", complaintDetails);
+
+            System.out.println("✅ Retrieved " + complaintDetails.size() + " resolved complaints");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error getting resolved complaints: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("success", false, "message", "Failed to get resolved complaints: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Get resolved complaints by status (RESOLVED or CLOSED)
+     */
+    @GetMapping("/resolved/{statusType}")
+    public ResponseEntity<?> getResolvedComplaintsByStatus(@PathVariable String statusType,
+                                                          @RequestHeader(value = "Authorization", required = false) String authHeader) {
+        try {
+            // Validate authentication
+            User currentUser = validateAndGetCurrentUser(authHeader);
+            if (currentUser == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("success", false, "message", "Authentication required"));
+            }
+
+            // Validate status type
+            if (!"resolved".equalsIgnoreCase(statusType) && !"closed".equalsIgnoreCase(statusType)) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("success", false, "message", "Invalid status type. Use 'resolved' or 'closed'"));
+            }
+
+            String statusCode = statusType.toUpperCase();
+            
+            // Find complaints by specific resolved status
+            List<Complaint> complaints = complaintRepository.findAll().stream()
+                .filter(complaint -> {
+                    if (complaint.getStatus() == null) return false;
+                    return statusCode.equals(complaint.getStatus().getCode());
+                })
+                .collect(Collectors.toList());
+
+            // Convert to response format
+            List<Map<String, Object>> complaintList = complaints.stream().map(complaint -> {
+                Map<String, Object> details = new HashMap<>();
+                details.put("id", complaint.getId());
+                details.put("title", complaint.getTitle());
+                details.put("category", complaint.getCategory());
+                details.put("status", complaint.getStatus().getDisplay());
+                details.put("createdAt", complaint.getCreatedAt());
+                details.put("updatedAt", complaint.getUpdatedAt());
+                details.put("anonymous", complaint.isAnonymous());
+                
+                if (!complaint.isAnonymous() && complaint.getUser() != null) {
+                    details.put("userName", complaint.getUser().getFullName());
+                }
+                
+                if (complaint.getAssignedTo() != null) {
+                    details.put("assignedTo", complaint.getAssignedTo().getFullName());
+                }
+                
+                return details;
+            }).collect(Collectors.toList());
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", statusType + " complaints retrieved successfully");
+            response.put("statusType", statusType.toUpperCase());
+            response.put("count", complaintList.size());
+            response.put("complaints", complaintList);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            System.err.println("❌ Error getting " + statusType + " complaints: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("success", false, "message", "Failed to get " + statusType + " complaints"));
+        }
+    }
+
     // Helper method to get display name for status code
     private String getDisplayNameForStatus(String statusCode) {
         return switch (statusCode) {

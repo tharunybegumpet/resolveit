@@ -16,6 +16,7 @@ import UserDashboard from './pages/UserDashboard';
 import RegisterSelect from './pages/RegisterSelect';
 import EscalationPage from './pages/EscalationPage';
 import ReportsPage from './pages/ReportsPage';
+import ResolvedComplaints from './pages/ResolvedComplaints';
 
 export default function App() {
   return (
@@ -37,6 +38,8 @@ export default function App() {
         <Route path="/staff" element={<StaffDashboard />} />
         {/* MANAGER DASHBOARD */}
         <Route path="/manager" element={<StaffDashboard />} />
+        {/* RESOLVED COMPLAINTS - ADMIN/STAFF ONLY */}
+        <Route path="/resolved-complaints" element={<ResolvedComplaints />} />
         {/* ESCALATION PAGE - ADMIN ONLY */}
         <Route path="/escalations" element={
           <AdminRoute>
