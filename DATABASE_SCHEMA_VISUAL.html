@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResolveIT Database Schema - Visual Diagram</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+        }
+        
+        .schema-container {
+            position: relative;
+            width: 100%;
+            height: 800px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #e9ecef;
+        }
+        
+        .table-box {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border: 2px solid #3498db;
+            min-width: 200px;
+            font-size: 12px;
+        }
+        
+        .table-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 6px 6px 0 0;
+        }
+        
+        .table-field {
+            padding: 6px 10px;
+            border-bottom: 1px solid #ecf0f1;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .table-field:last-child {
+            border-bottom: none;
+        }
+        
+        .field-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .field-type {
+            color: #7f8c8d;
+            font-size: 10px;
+        }
+        
+        .primary-key {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .foreign-key {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+        }
+        
+        /* Table Positions */
+        .users { top: 50px; left: 50px; }
+        .complaints { top: 50px; left: 300px; }
+        .complaint-status { top: 50px; left: 550px; }
+        .complaint-files { top: 250px; left: 300px; }
+        .escalations { top: 450px; left: 300px; }
+        .staff-applications { top: 250px; left: 50px; }
+        .comments { top: 450px; left: 550px; }
+        .attachments { top: 650px; left: 300px; }
+        .roles { top: 450px; left: 50px; }
+        
+        /* Relationship Lines */
+        .relationship-line {
+            position: absolute;
+            background: #e74c3c;
+            z-index: 1;
+        }
+        
+        .line-horizontal {
+            height: 2px;
+        }
+        
+        .line-vertical {
+            width: 2px;
+        }
+        
+        .relationship-label {
+            position: absolute;
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #e74c3c;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .legend {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .legend-box {
+            width: 20px;
+            height: 15px;
+            border-radius: 3px;
+        }
+        
+        .pk { background: #fff3cd; border: 2px solid #ffc107; }
+        .fk { background: #d1ecf1; border: 2px solid #17a2b8; }
+        .regular { background: white; border: 2px solid #3498db; }
+        
+        .stats {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗄️ ResolveIT Database Schema</h1>
+            <p>Complete visual representation of the complaint management system database</p>
+        </div>
+        
+        <div class="schema-container">
+            <!-- Users Table -->
+            <div class="table-box users">
+                <div class="table-header">👥 users</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">username</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">email</span>
+                    <span class="field-type">VARCHAR(150)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">password</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">full_name</span>
+                    <span class="field-type">VARCHAR(150)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">role</span>
+                    <span class="field-type">ENUM</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">is_active</span>
+                    <span class="field-type">BOOLEAN</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Complaints Table -->
+            <div class="table-box complaints">
+                <div class="table-header">📋 complaints</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">title</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">category</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">priority</span>
+                    <span class="field-type">ENUM</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">is_anonymous</span>
+                    <span class="field-type">BOOLEAN</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">user_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">assigned_to</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">status_id</span>
+                    <span class="field-type">INT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Complaint Status Table -->
+            <div class="table-box complaint-status">
+                <div class="table-header">🏷️ complaint_status</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INT PK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">code</span>
+                    <span class="field-type">VARCHAR(50)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">display</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+            </div>
+            
+            <!-- Complaint Files Table -->
+            <div class="table-box complaint-files">
+                <div class="table-header">📎 complaint_files</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">complaint_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">file_name</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">original_file_name</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">file_path</span>
+                    <span class="field-type">VARCHAR(500)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">file_type</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">admin_only</span>
+                    <span class="field-type">BOOLEAN</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">uploaded_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Escalations Table -->
+            <div class="table-box escalations">
+                <div class="table-header">⬆️ escalations</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">complaint_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">escalated_by_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">escalated_to_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">escalation_reason</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">escalation_type</span>
+                    <span class="field-type">ENUM</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">is_active</span>
+                    <span class="field-type">BOOLEAN</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Staff Applications Table -->
+            <div class="table-box staff-applications">
+                <div class="table-header">👔 staff_applications</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">user_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">categories</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">experience</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">skills</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">status</span>
+                    <span class="field-type">ENUM</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">reviewed_by</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Comments Table -->
+            <div class="table-box comments">
+                <div class="table-header">💬 comments</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">complaint_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">author_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">message</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">is_private</span>
+                    <span class="field-type">BOOLEAN</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Attachments Table (Legacy) -->
+            <div class="table-box attachments">
+                <div class="table-header">📁 attachments (legacy)</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">BIGINT PK</span>
+                </div>
+                <div class="table-field foreign-key">
+                    <span class="field-name">complaint_id</span>
+                    <span class="field-type">BIGINT FK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">filename</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">file_path</span>
+                    <span class="field-type">VARCHAR(500)</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">uploaded_at</span>
+                    <span class="field-type">TIMESTAMP</span>
+                </div>
+            </div>
+            
+            <!-- Roles Table (Legacy) -->
+            <div class="table-box roles">
+                <div class="table-header">🔐 roles (legacy)</div>
+                <div class="table-field primary-key">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INT PK</span>
+                </div>
+                <div class="table-field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">VARCHAR(50)</span>
+                </div>
+            </div>
+            
+            <!-- Relationship Lines -->
+            <div class="relationship-line line-horizontal" style="top: 130px; left: 250px; width: 50px;"></div>
+            <div class="relationship-label" style="top: 125px; left: 260px;">1:M</div>
+            
+            <div class="relationship-line line-horizontal" style="top: 150px; left: 500px; width: 50px;"></div>
+            <div class="relationship-label" style="top: 145px; left: 510px;">M:1</div>
+            
+            <div class="relationship-line line-vertical" style="top: 200px; left: 400px; height: 50px;"></div>
+            <div class="relationship-label" style="top: 220px; left: 405px;">1:M</div>
+            
+            <div class="relationship-line line-vertical" style="top: 400px; left: 400px; height: 50px;"></div>
+            <div class="relationship-label" style="top: 420px; left: 405px;">1:M</div>
+            
+            <div class="relationship-line line-horizontal" style="top: 330px; left: 200px; width: 100px;"></div>
+            <div class="relationship-label" style="top: 325px; left: 230px;">1:M</div>
+            
+            <div class="relationship-line line-horizontal" style="top: 530px; left: 500px; width: 50px;"></div>
+            <div class="relationship-label" style="top: 525px; left: 510px;">1:M</div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box pk"></div>
+                <span>Primary Key</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box fk"></div>
+                <span>Foreign Key</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box regular"></div>
+                <span>Regular Field</span>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">9</div>
+                <div class="stat-label">Total Tables</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Core Tables</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">12</div>
+                <div class="stat-label">Foreign Keys</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">MySQL</div>
+                <div class="stat-label">Database Engine</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
