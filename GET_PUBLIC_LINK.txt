@@ -1,0 +1,81 @@
+========================================
+  HOW TO GET PUBLIC LINK FOR YOUR PROJECT
+========================================
+
+🎯 EASIEST METHOD: NGROK (5 minutes)
+========================================
+
+1. Download Ngrok: https://ngrok.com/download
+2. Extract to C:\ngrok\
+3. Sign up free: https://dashboard.ngrok.com/signup
+4. Get token: https://dashboard.ngrok.com/get-started/your-authtoken
+5. Run: cd C:\ngrok && ngrok config add-authtoken YOUR_TOKEN
+
+6. Start backend: cd resolveit-backend && mvn spring-boot:run
+7. Start frontend: cd resolveit-frontend && npm start
+
+8. Create public URLs:
+   Terminal 1: cd C:\ngrok && ngrok http 8080
+   Terminal 2: cd C:\ngrok && ngrok http 3000
+
+9. Copy the URLs and share!
+
+📖 DETAILED GUIDE: See NGROK_QUICK_START.txt
+
+========================================
+  YOUR LINKS TO SHARE:
+========================================
+
+GitHub (Code):
+https://github.com/tharunybegumpet/resolveit
+
+Live Demo (After Ngrok setup):
+https://YOUR-NGROK-URL.ngrok-free.app
+
+Demo Credentials:
+Admin: tharuny.begumpet@gmail.com / admin123
+User:  user1@resolveit.com / password123
+
+========================================
+  ADD TO RESUME:
+========================================
+
+ResolveIT - Grievance Management System
+GitHub: https://github.com/tharunybegumpet/resolveit
+Live Demo: [Your Ngrok URL]
+
+• Full-stack complaint management with email notifications
+• Java Spring Boot | React 18 | MySQL | JWT Authentication
+• 30+ RESTful APIs, role-based access, file uploads, analytics
+
+========================================
+  ALTERNATIVE: PERMANENT LINK
+========================================
+
+For a link that never expires, deploy to cloud:
+
+Frontend (Vercel - Free):
+1. npm install -g vercel
+2. cd resolveit-frontend
+3. vercel
+4. Get URL: https://resolveit.vercel.app
+
+Backend (Render - Free):
+1. Go to render.com
+2. Connect GitHub
+3. Deploy backend
+4. Get URL: https://resolveit-backend.onrender.com
+
+See DEPLOYMENT_GUIDE.md for details.
+
+========================================
+  QUICK HELP:
+========================================
+
+✅ For instant demo (2 hours): Use Ngrok
+✅ For permanent link: Deploy to Vercel + Render
+✅ For code sharing: Use GitHub link
+
+All guides are in your project folder!
+
+========================================
