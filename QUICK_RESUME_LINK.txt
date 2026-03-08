@@ -1,0 +1,62 @@
+========================================
+  RESOLVEIT - GITHUB LINK FOR RESUME
+========================================
+
+Your GitHub Repository:
+https://github.com/tharunybegumpet/resolveit
+
+========================================
+  ADD TO YOUR RESUME
+========================================
+
+ResolveIT - Grievance Management System
+GitHub: https://github.com/tharunybegumpet/resolveit
+
+• Full-stack complaint management system with email notifications
+• Java Spring Boot | React 18 | MySQL | JWT Authentication
+• 30+ RESTful APIs, role-based access, file uploads, analytics
+• Automated email system with Gmail SMTP integration
+
+========================================
+  PROJECT HIGHLIGHTS
+========================================
+
+✅ Complete complaint lifecycle management
+✅ Automated email notifications
+✅ Secure file uploads (admin-only for PDFs/videos)
+✅ Interactive charts and analytics
+✅ Staff management and escalation system
+✅ 9 database tables with normalized schema
+✅ JWT authentication with BCrypt encryption
+
+========================================
+  TECH STACK
+========================================
+
+Backend:  Java 17, Spring Boot 3.x, Spring Security, JPA
+Frontend: React 18, Bootstrap 5, Chart.js
+Database: MySQL 8.0
+Security: JWT, BCrypt, Role-based Authorization
+Email:    Gmail SMTP Integration
+
+========================================
+  DEMO CREDENTIALS
+========================================
+
+Admin: tharuny.begumpet@gmail.com / admin123
+User:  user1@resolveit.com / password123
+
+========================================
+  STATUS
+========================================
+
+✅ Code pushed to GitHub
+✅ Documentation complete
+✅ All features working
+✅ Ready for deployment
+✅ Ready to add to resume
+
+========================================
+
+Last Updated: March 8, 2026
+Repository: Public and Ready
