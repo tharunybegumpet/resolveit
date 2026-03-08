@@ -1,0 +1,85 @@
+========================================
+  NGROK QUICK START - GET PUBLIC URL
+========================================
+
+STEP 1: DOWNLOAD NGROK (2 minutes)
+-----------------------------------
+1. Go to: https://ngrok.com/download
+2. Click "Download for Windows"
+3. Extract ngrok.exe to C:\ngrok\
+4. Sign up free: https://dashboard.ngrok.com/signup
+5. Get auth token: https://dashboard.ngrok.com/get-started/your-authtoken
+
+STEP 2: SETUP NGROK (1 minute)
+-------------------------------
+Open Command Prompt:
+  cd C:\ngrok
+  ngrok config add-authtoken YOUR_TOKEN_HERE
+
+STEP 3: START PROJECT (2 minutes)
+----------------------------------
+Terminal 1:
+  cd projects\resolveit_option_c_full\resolveit-backend
+  mvn spring-boot:run
+
+Terminal 2:
+  cd projects\resolveit_option_c_full\resolveit-frontend
+  npm start
+
+STEP 4: CREATE PUBLIC URLS (1 minute)
+--------------------------------------
+Terminal 3:
+  cd C:\ngrok
+  ngrok http 8080
+  
+  COPY THE URL! Example: https://abc123.ngrok-free.app
+
+Terminal 4:
+  cd C:\ngrok
+  ngrok http 3000
+  
+  COPY THE URL! Example: https://xyz789.ngrok-free.app
+
+STEP 5: UPDATE FRONTEND (1 minute)
+-----------------------------------
+1. Open: resolveit-frontend\src\App.js
+2. Find: http://localhost:8080
+3. Replace with: https://abc123.ngrok-free.app (your backend URL)
+4. Save file
+
+STEP 6: SHARE YOUR LINK! 🎉
+---------------------------
+Your Live Demo: https://xyz789.ngrok-free.app (your frontend URL)
+
+Demo Login:
+  Admin: tharuny.begumpet@gmail.com / admin123
+  User:  user1@resolveit.com / password123
+
+========================================
+  ADD TO RESUME/LINKEDIN:
+========================================
+
+Live Demo: https://xyz789.ngrok-free.app
+GitHub: https://github.com/tharunybegumpet/resolveit
+
+========================================
+  IMPORTANT NOTES:
+========================================
+
+✅ Keep all 4 terminals running
+✅ Free URLs expire after 2 hours inactive
+✅ Get new URLs each time you restart
+✅ First visitors see ngrok warning - click "Visit Site"
+
+========================================
+  ALTERNATIVE: PERMANENT LINK
+========================================
+
+For a link that never expires:
+- Deploy frontend to Vercel (free)
+- Deploy backend to Render (free)
+- See DEPLOYMENT_GUIDE.md
+
+Takes 30 minutes but link is permanent!
+
+========================================
