@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tharuny Begumpet - LinkedIn Profile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+            box-shadow: 0 10px 30px rgba(0, 119, 181, 0.3);
+        }
+
+        h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .linkedin-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #0077b5 0%, #00a0dc 100%);
+            color: white;
+            text-decoration: none;
+            padding: 18px 50px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 119, 181, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .linkedin-button:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: left 0.5s ease;
+        }
+
+        .linkedin-button:hover:before {
+            left: 100%;
+        }
+
+        .linkedin-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 119, 181, 0.5);
+        }
+
+        .linkedin-button:active {
+            transform: translateY(-1px);
+        }
+
+        .linkedin-icon {
+            margin-right: 10px;
+            font-size: 24px;
+            vertical-align: middle;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: left;
+        }
+
+        .info-box h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            color: #555;
+            padding: 8px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box li:before {
+            content: "✓";
+            color: #0077b5;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .github-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0077b5;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+        }
+
+        .github-link:hover {
+            color: #00a0dc;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .linkedin-button {
+                padding: 15px 40px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="profile-icon">
+            <span>👨‍💻</span>
+        </div>
+        
+        <h1>Tharuny Begumpet</h1>
+        <p class="subtitle">Full-Stack Java Developer</p>
+        
+        <a href="https://www.linkedin.com/in/tharuny-begumpet-b33a66303" 
+           target="_blank" 
+           class="linkedin-button">
+            <span class="linkedin-icon">in</span>
+            View LinkedIn Profile
+        </a>
+
+        <div class="info-box">
+            <h3>🚀 Featured Project: ResolveIT</h3>
+            <ul>
+                <li>Full-Stack Grievance Management System</li>
+                <li>Java Spring Boot | React 18 | MySQL</li>
+                <li>JWT Authentication & Email Integration</li>
+                <li>30+ RESTful APIs with Role-Based Access</li>
+                <li>Interactive Charts & Analytics Dashboard</li>
+            </ul>
+        </div>
+
+        <a href="https://github.com/tharunybegumpet/resolveit" 
+           target="_blank" 
+           class="github-link">
+            📂 View Project on GitHub →
+        </a>
+    </div>
+
+    <script>
+        // Auto-redirect option (uncomment if you want automatic redirect)
+        // setTimeout(() => {
+        //     window.location.href = 'https://www.linkedin.com/in/tharuny-begumpet-b33a66303';
+        // }, 3000); // Redirects after 3 seconds
+    </script>
+</body>
+</html>

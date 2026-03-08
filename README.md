@@ -1,5 +1,8 @@
 # ResolveIT - Complete Complaint Management System
 
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Tharuny%20Begumpet-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/tharuny-begumpet-b33a66303)
+[![GitHub](https://img.shields.io/badge/GitHub-tharunybegumpet-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/tharunybegumpet)
+
 A full-stack complaint management system built with **Spring Boot** (Backend) and **React** (Frontend).
 
 ## 🚀 Features
@@ -192,9 +195,17 @@ The project includes several HTML testing tools:
 
 ## 👨‍💻 Developer
 
-**Your Name**  
-**Email**: your.email@example.com  
-**GitHub**: https://github.com/yourusername
+**Tharuny Begumpet**  
+**LinkedIn**: [Connect with me](https://www.linkedin.com/in/tharuny-begumpet-b33a66303)  
+**GitHub**: [tharunybegumpet](https://github.com/tharunybegumpet)  
+**Email**: tharuny.begumpet@gmail.com
+
+### 🛠️ Tech Stack Expertise
+- **Backend:** Java 17, Spring Boot, Spring Security, JPA/Hibernate
+- **Frontend:** React 18, JavaScript ES6+, Bootstrap 5, Chart.js
+- **Database:** MySQL 8.0
+- **Security:** JWT Authentication, BCrypt, Role-Based Access Control
+- **Tools:** Git, Maven, npm, RESTful APIs
 
 ## 📄 License
 
